@@ -1,82 +1,113 @@
-# Pieces Copilot Service
+# Pieces Service
 
-This is a minimal HTTP wrapper around the Pieces SDK Copilot functionality. It provides a simple FastAPI service that exposes the copilot's `ask` capability via HTTP endpoints.
+HTTP API wrapper for the Pieces SDK Copilot, providing simple GET/POST endpoints and FastMCP integration for AI-powered code assistance.
 
 ## Features
 
-- Synchronous `ask` API for querying the Pieces copilot
-- Automatic host discovery for Pieces OS server
-- Clear logging for observability and debugging
-- Docker containerized for easy deployment
+- **Dual interfaces**: REST API (GET/POST) and FastMCP for flexible integration
+- **Streaming responses**: Real-time copilot answers
+- **Clean architecture**: Modular design with focused single-purpose functions
+- **Request logging**: UUID-tracked requests with detailed metrics
 
-## Endpoints
-
-- `POST /copilot/ask` - JSON body: `{"prompt": "..."}` - Response: `{"result": "..."}`
-- `GET /copilot/ask?prompt=...` - Convenience GET endpoint returning same JSON shape
-
-## Build and Run
-
-### Build
+## Quick Start
 
 ```bash
-docker build -t pieces-copilot-service pieces_service/
+# Install dependencies
+cd pieces_service
+uv sync
+
+# Run the service
+uv run uvicorn pieces_service.api:app --reload --port 4000
 ```
 
-### Run (Windows Docker Desktop)
+## API Endpoints
 
-```bash
-docker run --rm -p 4000:4000 pieces-copilot-service
-```
+### POST /copilot/ask
 
-### Example Usage
-
-POST request:
+Send a question to the Pieces copilot.
 
 ```bash
 curl -X POST http://localhost:4000/copilot/ask \
   -H "Content-Type: application/json" \
-  -d '{"prompt":"What is the capital of France?"}'
+  -d '{"prompt": "How do I reverse a list in Python?"}'
 ```
 
-GET request:
+Response:
+
+```json
+{
+  "result": "You can reverse a list using .reverse() method or [::-1] slicing..."
+}
+```
+
+### GET /copilot/ask
+
+Query via URL parameter:
 
 ```bash
-curl "http://localhost:4000/copilot/ask?prompt=What%20is%20the%20capital%20of%20France%3F"
+curl "http://localhost:4000/copilot/ask?prompt=Explain+async+await+in+Python"
 ```
 
-## Connectivity Notes
+## Project Structure
 
-The service attempts to connect to a Pieces OS server running on the host machine. It tries the following hosts in order:
-
-1. `http://host.docker.internal:1000` (Windows Docker Desktop default)
-2. `http://host.docker.internal:5323` (Linux Docker Desktop default)
-3. `http://localhost:1000`
-4. `http://localhost:5323`
-
-### Requirements
-
-- Pieces OS must be running and exposing an HTTP endpoint on the host
-- For Docker Desktop on Windows, `host.docker.internal` should resolve to the host
-- If `host.docker.internal` doesn't work in your environment, try:
-
-```bash
-docker run --rm -p 4000:4000 --add-host=host.docker.internal:host-gateway pieces-copilot-service
+```
+pieces_service/
+├── src/pieces_service/
+│   ├── api.py              # FastAPI application and endpoints
+│   ├── client.py           # Pieces SDK wrapper
+│   ├── models.py           # Pydantic request/response models
+│   ├── logging_config.py   # Logging setup
+│   └── __init__.py
+├── data/
+│   ├── in/                 # Input data (if needed)
+│   └── out/                # Output logs/responses
+├── app/                    # Legacy compatibility (deprecated)
+└── README.md
 ```
 
-### Troubleshooting
+## Architecture
 
-- Ensure Pieces OS is running and accessible
-- Check the service logs for host discovery attempts and errors
-- If Pieces OS uses a different port, the service may need modification
-- The service assumes Pieces OS exposes an HTTP API; if it only uses local IPC/sockets, additional configuration is required
+### Client Layer (`client.py`)
+
+Thin wrapper around Pieces SDK:
+
+- `ask_copilot_question`: Main entry point
+- `stream_copilot_response`: Handle SDK streaming
+- `strip_markdown_code_blocks`: Clean response formatting
+
+### API Layer (`api.py`)
+
+FastAPI application with:
+
+- Lifespan management for startup/shutdown
+- Request logging with UUIDs
+- Error handling and HTTP exceptions
+- FastMCP integration
+
+### Models (`models.py`)
+
+Pydantic validation for:
+
+- `AskRequest`: Incoming prompts
+- `AskResponse`: Copilot results
 
 ## Dependencies
 
-- `fastapi` - Web framework
-- `uvicorn[standard]` - ASGI server
-- `pieces_os_client` - Pieces SDK client
-- `pydantic` - Data validation
+- **fastapi**: Web framework
+- **fastapi-mcp**: MCP protocol integration
+- **uvicorn**: ASGI server
+- **pieces_os_client**: Pieces SDK
+- **pydantic**: Data validation
 
-## Logging
+## Development
 
-The service logs all requests, host discovery attempts, SDK interactions, and errors to stdout with timestamps and request IDs for correlation.
+All code follows clean code principles:
+
+- Functions < 20 lines
+- Single responsibility per function
+- Comprehensive Doxygen documentation
+- Clear separation of concerns
+
+## License
+
+MIT

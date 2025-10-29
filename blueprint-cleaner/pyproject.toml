@@ -1,0 +1,25 @@
+[project]
+name = "blueprint-cleaner"
+version = "0.1.0"
+description = "Generate AI-ready summaries from Unreal Engine blueprint COPY exports."
+readme = "README.md"
+authors = [
+    { name = "Octavian Tocan", email = "tocanoctavian@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = ["toolkit"]
+
+[project.scripts]
+blueprint-cleaner = "blueprint_cleaner.cli:main"
+clean-blueprint = "blueprint_cleaner.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.2,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+toolkit = { path = "../", editable = true }
+blueprint_cleaner = { path = "src" }

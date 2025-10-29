@@ -1,0 +1,31 @@
+[project]
+name = "unified-api"
+version = "0.1.0"
+description = "Unified API combining blueprint-cleaner and pieces-service"
+readme = "README.md"
+authors = [
+    {name = "Octavian Tocan", email = "tocanoctavian@gmail.com"}
+]
+dependencies = [
+    "fastapi",
+    "fastapi-mcp",
+    "uvicorn[standard]",
+    "python-multipart",
+    "blueprint-cleaner",
+    "pieces-service",
+]
+requires-python = ">=3.13"
+
+[project.scripts]
+unified-api = "uvicorn unified_api.main:app"
+
+[tool.uv.sources]
+blueprint-cleaner = { path = "../blueprint-cleaner", editable = true }
+pieces-service = { path = "../pieces_service", editable = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/unified_api"]

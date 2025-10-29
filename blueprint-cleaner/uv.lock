@@ -1,0 +1,19 @@
+version = 1
+revision = 3
+requires-python = ">=3.13"
+
+[[package]]
+name = "blueprint-cleaner"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "toolkit" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "toolkit", editable = "../" }]
+
+[[package]]
+name = "toolkit"
+version = "0.1.0"
+source = { editable = "../" }
