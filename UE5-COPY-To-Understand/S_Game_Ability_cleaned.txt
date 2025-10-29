@@ -1,0 +1,11 @@
+=== Blueprint: S_Game_Ability ===
+
+
+--- Classes/Structures ---
+- Structure: S_Game_Ability
+
+--- Variables ---
+- Tags_Required (Type: byte, Array) [Uses: E_IG_Tag_Type]
+- Tags_Removed (Type: byte, Array) [Uses: E_IG_Tag_Type]
+- Tags_Blocked (Type: byte, Array) [Uses: E_IG_Tag_Type]
+- Tags_Added (Type: byte, Array) [Uses: E_IG_Tag_Type]
