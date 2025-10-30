@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .analysis import build_function_synopses
 from .graphs import summarize_graphs
 from .metadata import build_metadata
 from .models import BlueprintReport
@@ -14,4 +15,10 @@ def build_blueprint_report(content: str, debug: bool = False) -> BlueprintReport
     metadata = build_metadata(content)
     variables = extract_variables(content)
     graphs = summarize_graphs(content, debug)
-    return BlueprintReport(metadata=metadata, variables=variables, graphs=graphs)
+    functions = build_function_synopses(graphs)
+    return BlueprintReport(
+        metadata=metadata,
+        variables=variables,
+        graphs=graphs,
+        functions=functions,
+    )

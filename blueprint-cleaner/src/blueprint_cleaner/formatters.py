@@ -1,24 +1,25 @@
-"""Output rendering orchestration.
-
-Routes blueprint reports to appropriate formatter based on format type.
-"""
+"""Output rendering orchestration for blueprint artifacts."""
 
 from __future__ import annotations
 
-from .formatters.json_output import render_json_output
-from .formatters.markdown import format_as_markdown
-from .models import BlueprintReport
+import json
+
+from .artifacts import BlueprintArtifacts
 
 
-def render_output(report: BlueprintReport, format_type: str) -> str:
-    """Render blueprint report in requested format.
+def render_output(artifacts: BlueprintArtifacts, format_type: str) -> str:
+    """Render blueprint artifacts in the requested format."""
 
-    @param report: Structured blueprint data.
-    @param format_type: Output format ("markdown", "json").
-    @return: Formatted output string.
-    """
     fmt = format_type.lower()
     if fmt == "json":
-        return render_json_output(report)
-    return format_as_markdown(report)
+        return artifacts.json_text
+    if fmt == "bundle":
+        return json.dumps(artifacts.to_bundle(), indent=2)
+    if fmt == "summary":
+        return artifacts.ai_summary
+    if fmt == "cpp-header":
+        return artifacts.cpp_header
+    if fmt == "cpp-source":
+        return artifacts.cpp_source
+    return artifacts.markdown
 

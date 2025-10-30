@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import List, Sequence
 
-from ..models import BlueprintReport, GraphSummary, VariableInfo
+from ..models import BlueprintReport, FunctionSynopsis, GraphSummary, VariableInfo
 
 
 def format_as_markdown(report: BlueprintReport) -> str:
@@ -20,6 +20,7 @@ def format_as_markdown(report: BlueprintReport) -> str:
     sections = [
         render_summary_section(report),
         render_variable_section(report.variables),
+        render_function_section(report.functions),
         render_graph_section(report.graphs),
     ]
     return "\n\n".join(section for section in sections if section)
@@ -187,6 +188,38 @@ def render_graph_item(graph: GraphSummary) -> List[str]:
             lines.append(f"  - Node Mix: {node_mix}")
 
     return lines
+
+
+def render_function_section(functions: Sequence[FunctionSynopsis]) -> str:
+    """Render function synopses with concise descriptions.
+
+    @param functions: Function synopsis collection.
+    @return: Markdown section listing logic flows.
+    """
+    if not functions:
+        return ""
+
+    lines: List[str] = ["## Logic Flows"]
+    for synopsis in functions:
+        lines.append(f"### {synopsis.display_name} ({synopsis.category})")
+        lines.append(f"{synopsis.description}")
+
+        if synopsis.calls:
+            call_text = ", ".join(synopsis.calls)
+            lines.append(f"- Calls: {call_text}")
+        if synopsis.reads:
+            read_text = ", ".join(synopsis.reads)
+            lines.append(f"- Reads: {read_text}")
+        if synopsis.writes:
+            write_text = ", ".join(synopsis.writes)
+            lines.append(f"- Writes: {write_text}")
+        if synopsis.entry_points:
+            entry_text = ", ".join(synopsis.entry_points)
+            lines.append(f"- Entry Points: {entry_text}")
+
+        lines.append("")
+
+    return "\n".join(line for line in lines if line)
 
 
 def render_graph_comments(comments: Sequence[str], limit: int) -> List[str]:

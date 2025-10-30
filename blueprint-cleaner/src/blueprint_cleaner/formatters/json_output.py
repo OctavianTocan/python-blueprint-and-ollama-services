@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 
-from ..models import BlueprintReport, GraphSummary, VariableInfo
+from ..models import BlueprintReport, FunctionSynopsis, GraphSummary, VariableInfo
 
 
 def render_json_output(report: BlueprintReport) -> str:
@@ -30,6 +30,7 @@ def report_to_dict(report: BlueprintReport) -> dict:
         "parent_class": report.metadata.parent_class,
         "variables": [variable_to_dict(variable) for variable in report.variables],
         "graphs": [graph_to_dict(graph) for graph in report.graphs],
+        "functions": [function_to_dict(fn) for fn in report.functions],
     }
 
 
@@ -63,4 +64,21 @@ def variable_to_dict(variable: VariableInfo) -> dict:
         "type": variable.var_type,
         "container": variable.container,
         "subtype": variable.subtype,
+    }
+
+
+def function_to_dict(function: FunctionSynopsis) -> dict:
+    """Serialize function synopsis to dictionary."""
+
+    return {
+        "name": function.name,
+        "display_name": function.display_name,
+        "category": function.category,
+        "entry_points": function.entry_points,
+        "calls": function.calls,
+        "reads": function.reads,
+        "writes": function.writes,
+        "description": function.description,
+        "access": function.access,
+        "is_event": function.is_event,
     }

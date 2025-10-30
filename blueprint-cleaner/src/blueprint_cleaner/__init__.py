@@ -5,6 +5,7 @@ from .models import (
     BlueprintReport,
     GraphBlock,
     GraphSummary,
+    FunctionSynopsis,
     NodeBlock,
     VariableInfo,
 )
@@ -16,6 +17,7 @@ __all__ = [
     "BlueprintReport",
     "GraphBlock",
     "GraphSummary",
+    "FunctionSynopsis",
     "NodeBlock",
     "VariableInfo",
     "build_blueprint_report",

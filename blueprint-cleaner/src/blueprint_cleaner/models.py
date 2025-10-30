@@ -58,9 +58,26 @@ class GraphSummary:
 
 
 @dataclass
+class FunctionSynopsis:
+    """Structured narrative built from a graph summary."""
+
+    name: str
+    display_name: str
+    category: str
+    entry_points: List[str]
+    calls: List[str]
+    reads: List[str]
+    writes: List[str]
+    description: str
+    access: str = "Public"
+    is_event: bool = False
+
+
+@dataclass
 class BlueprintReport:
     """Top-level summary produced for a blueprint."""
 
     metadata: BlueprintMetadata
     variables: List[VariableInfo]
     graphs: List[GraphSummary]
+    functions: List[FunctionSynopsis] = field(default_factory=list)
