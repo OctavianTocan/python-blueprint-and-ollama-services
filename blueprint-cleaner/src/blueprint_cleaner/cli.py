@@ -8,6 +8,15 @@ import sys
 
 from .pipeline import clean_blueprint_file
 
+SUPPORTED_FORMATS = [
+    "markdown",
+    "json",
+    "bundle",
+    "summary",
+    "cpp-header",
+    "cpp-source",
+]
+
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the argument parser for the CLI."""
@@ -32,7 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-f",
         "--format",
-        choices=["markdown", "text", "json"],
+        choices=SUPPORTED_FORMATS + ["text"],
         default="markdown",
         help="Output format (default: markdown)",
     )
@@ -54,7 +63,16 @@ def main(argv: list[str] | None = None) -> None:
     output_path = args.output
     if not output_path:
         base_name = os.path.splitext(args.input)[0]
-        extension = ".json" if args.format == "json" else ".md"
+        format_choice = args.format if args.format != "text" else "markdown"
+        extension_map = {
+            "markdown": ".md",
+            "json": ".json",
+            "bundle": ".bundle.json",
+            "summary": ".summary.txt",
+            "cpp-header": ".h",
+            "cpp-source": ".cpp",
+        }
+        extension = extension_map.get(format_choice, ".md")
         output_path = f"{base_name}_cleaned{extension}"
 
     format_choice = "markdown" if args.format == "text" else args.format

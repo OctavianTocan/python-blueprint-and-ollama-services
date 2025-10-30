@@ -67,5 +67,8 @@ def test_clean_blueprint_bundle_returns_cpp_artifacts(client: TestClient) -> Non
     assert cpp_bundle["header"].startswith("#pragma once")
     assert "class ABP_Test" in cpp_bundle["header"]
     assert cpp_bundle["source"].startswith('#include "BP_Test.h"')
+    assert cpp_bundle["header_path"] == "Source/Game/BP_Test.h"
+    assert cpp_bundle["source_path"] == "Source/Game/BP_Test.cpp"
 
     assert "bundle" in payload["metadata"]["formats"]
+    assert payload["metadata"]["cpp_class"] == "ABP_Test"

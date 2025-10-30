@@ -70,12 +70,14 @@ def test_generate_artifacts_exposes_all_required_outputs():
     # Structured report should remain a dataclass for introspection.
     assert is_dataclass(artifacts.report)
     assert artifacts.report.metadata.name == "BP_Test"
+    assert artifacts.report.metadata.cpp_class_name == "ABP_Test"
     assert any("Health" in variable.name for variable in artifacts.report.variables)
 
     # Markdown and JSON outputs must be populated and consistent.
     assert "# Blueprint: BP_Test" in artifacts.markdown
     payload = json.loads(artifacts.json_text)
     assert payload["name"] == "BP_Test"
+    assert payload["cpp_class"] == "ABP_Test"
     assert payload["graphs"], "Expected serialized graphs in JSON output"
 
     # AI summary should derive from batch prompts.
@@ -88,6 +90,8 @@ def test_generate_artifacts_exposes_all_required_outputs():
     assert "class ABP_Test" in artifacts.cpp_header
     assert artifacts.cpp_source.startswith('#include "BP_Test.h"')
     assert "void ABP_Test::" in artifacts.cpp_source
+    assert artifacts.cpp_header_path == "Source/Game/BP_Test.h"
+    assert artifacts.cpp_source_path == "Source/Game/BP_Test.cpp"
 
 
 def test_generate_bundled_output_returns_json_bundle(tmp_path):
@@ -109,6 +113,7 @@ def test_generate_bundled_output_returns_json_bundle(tmp_path):
     bundle = json.loads(bundle_text)
 
     assert bundle["metadata"]["name"] == "BP_Test"
+    assert "bundle" in bundle["metadata"]["formats"]
     assert bundle["ai_summary"].startswith("<summary-")
 
     cpp_bundle = bundle["cpp"]
@@ -116,6 +121,8 @@ def test_generate_bundled_output_returns_json_bundle(tmp_path):
     assert cpp_bundle["header"].startswith("#pragma once")
     assert "class ABP_Test" in cpp_bundle["header"]
     assert cpp_bundle["source"].startswith('#include "BP_Test.h"')
+    assert cpp_bundle["header_path"] == "Source/Game/BP_Test.h"
+    assert cpp_bundle["source_path"] == "Source/Game/BP_Test.cpp"
 
 
 @pytest.mark.parametrize("chunk_size, expected_calls", [(80, 3), (400, 1)])

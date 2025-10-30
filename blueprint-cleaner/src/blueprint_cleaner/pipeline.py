@@ -46,6 +46,8 @@ def generate_blueprint_artifacts(
         ai_summary=summary,
         cpp_header=cpp.header,
         cpp_source=cpp.source,
+        cpp_header_path=cpp.header_path,
+        cpp_source_path=cpp.source_path,
         functions=report.functions,
     )
 
@@ -79,6 +81,10 @@ def render_output(artifacts: BlueprintArtifacts, format_type: str) -> str:
         return json.dumps(artifacts.to_bundle(), indent=2)
     if fmt == "summary":
         return artifacts.ai_summary
+    if fmt == "cpp-header":
+        return artifacts.cpp_header
+    if fmt == "cpp-source":
+        return artifacts.cpp_source
     return artifacts.markdown
 
 

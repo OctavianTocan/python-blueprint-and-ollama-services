@@ -13,6 +13,7 @@ class BlueprintMetadata:
 
     name: str
     parent_class: Optional[str]
+    cpp_class_name: str
 
 
 @dataclass

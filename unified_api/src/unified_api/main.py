@@ -7,14 +7,18 @@ FastAPI application with FastMCP integration.
 from __future__ import annotations
 
 import logging
+import os
 import sys
 import uuid
 from contextlib import asynccontextmanager
-from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, UploadFile
-from fastapi_mcp import FastMCP
+from fastapi import FastAPI, Form, HTTPException, UploadFile
 from pydantic import BaseModel
+
+try:
+    from fastapi_mcp import FastMCP
+except ImportError:  # pragma: no cover - optional dependency
+    FastMCP = None  # type: ignore
 
 # Configure logging
 logging.basicConfig(
@@ -24,15 +28,6 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-
-
-class BlueprintRequest(BaseModel):
-    """Request for blueprint cleaning operation.
-
-    @attr format: Output format (markdown or json).
-    """
-
-    format: str = "markdown"
 
 
 class BlueprintResponse(BaseModel):
@@ -89,43 +84,36 @@ app = FastAPI(
 
 
 @app.post("/blueprint/clean", response_model=BlueprintResponse)
-async def clean_blueprint(file: UploadFile, request: BlueprintRequest = BlueprintRequest()) -> BlueprintResponse:
+async def clean_blueprint(file: UploadFile, format: str = Form("markdown")) -> BlueprintResponse:
     """Clean a blueprint .COPY file.
 
     @param file: Uploaded .COPY file.
-    @param request: Format options.
+    @param format: Output format requested via form field.
     @return: Cleaned blueprint result.
     @raises HTTPException: On processing error.
     """
-    from blueprint_cleaner.pipeline import clean_blueprint_file
-    import tempfile
+    from blueprint_cleaner.artifacts import AVAILABLE_FORMATS
+    from blueprint_cleaner.pipeline import generate_blueprint_artifacts, render_output
 
     request_id = str(uuid.uuid4())
-    logger.info(f"Request {request_id}: POST /blueprint/clean, file: {file.filename}, format: {request.format}")
+    logger.info(f"Request {request_id}: POST /blueprint/clean, file: {file.filename}, format: {format}")
 
     try:
-        # Save uploaded file temporarily
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".COPY") as tmp_in:
-            content = await file.read()
-            tmp_in.write(content)
-            tmp_in_path = tmp_in.name
-
-        # Process blueprint
-        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{request.format}") as tmp_out:
-            tmp_out_path = tmp_out.name
-
-        success = clean_blueprint_file(tmp_in_path, tmp_out_path, format_type=request.format)
-
-        if not success:
-            raise RuntimeError("Blueprint processing failed")
-
-        # Read result
-        with open(tmp_out_path, "r", encoding="utf-8") as f:
-            result = f.read()
-
-        # Cleanup
-        Path(tmp_in_path).unlink(missing_ok=True)
-        Path(tmp_out_path).unlink(missing_ok=True)
+        content = await file.read()
+        content_text = content.decode("utf-8")
+        summariser = _select_summariser()
+        format_choice = format.lower()
+        if format_choice == "text":
+            format_choice = "markdown"
+        valid_formats = set(AVAILABLE_FORMATS + ["text"])
+        if format_choice not in valid_formats:
+            raise HTTPException(status_code=400, detail=f"Unsupported format '{format}'")
+        effective_format = "markdown" if format_choice == "text" else format_choice
+        artifacts = generate_blueprint_artifacts(
+            content_text,
+            summariser=summariser,
+        )
+        result = render_output(artifacts, effective_format)
 
         logger.info(f"Request {request_id}: Success, output size: {len(result)} chars")
 
@@ -133,8 +121,10 @@ async def clean_blueprint(file: UploadFile, request: BlueprintRequest = Blueprin
             result=result,
             metadata={
                 "filename": file.filename,
-                "format": request.format,
+                "format": format,
                 "size": len(result),
+                "formats": AVAILABLE_FORMATS,
+                "cpp_class": artifacts.report.metadata.cpp_class_name,
             },
         )
 
@@ -169,5 +159,34 @@ async def ask_copilot(request: CopilotRequest) -> CopilotResponse:
 
 
 # Mount FastMCP
-mcp = FastMCP(app)
-mcp.mount()
+if FastMCP is not None:  # pragma: no branch - optional mounting
+    mcp = FastMCP(app)
+    mcp.mount()
+else:
+    mcp = None
+
+
+def run() -> None:
+    """Run the unified API using uvicorn."""
+
+    import uvicorn
+
+    uvicorn.run("unified_api.main:app", host="0.0.0.0", port=8000)
+
+
+def _select_summariser():
+    """Choose summariser callable, preferring Pieces when enabled."""
+
+    use_pieces = os.getenv("PIECES_USE_SERVICE", "0").lower() in {"1", "true", "yes"}
+    if use_pieces:
+        try:
+            from pieces_service.client import ask_copilot_question
+
+            return ask_copilot_question
+        except Exception as exc:  # pragma: no cover - log and fall back
+            logger.warning("Pieces service unavailable, falling back to stub summariser: %s", exc)
+
+    def _stub(prompt: str) -> str:
+        return "Generated summary unavailable in offline mode."
+
+    return _stub

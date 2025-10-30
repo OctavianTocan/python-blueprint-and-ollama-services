@@ -10,6 +10,7 @@ from typing import Optional
 
 from toolkit.text_parsing import extract_tail_identifier
 
+from .cpp_utils import infer_cpp_class_name
 from .models import BlueprintMetadata
 
 
@@ -21,7 +22,8 @@ def build_metadata(content: str) -> BlueprintMetadata:
     """
     name = extract_blueprint_name(content)
     parent = extract_parent_class(content)
-    return BlueprintMetadata(name=name, parent_class=parent)
+    cpp_class = infer_cpp_class_name(name, parent)
+    return BlueprintMetadata(name=name, parent_class=parent, cpp_class_name=cpp_class)
 
 
 def extract_blueprint_name(content: str) -> str:

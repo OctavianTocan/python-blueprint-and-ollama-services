@@ -28,6 +28,7 @@ def report_to_dict(report: BlueprintReport) -> dict:
     return {
         "name": report.metadata.name,
         "parent_class": report.metadata.parent_class,
+        "cpp_class": report.metadata.cpp_class_name,
         "variables": [variable_to_dict(variable) for variable in report.variables],
         "graphs": [graph_to_dict(graph) for graph in report.graphs],
         "functions": [function_to_dict(fn) for fn in report.functions],

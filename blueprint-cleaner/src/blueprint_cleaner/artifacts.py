@@ -8,6 +8,15 @@ from typing import Dict
 
 from .models import BlueprintReport, FunctionSynopsis
 
+AVAILABLE_FORMATS = [
+    "markdown",
+    "json",
+    "summary",
+    "bundle",
+    "cpp-header",
+    "cpp-source",
+]
+
 
 @dataclass
 class BlueprintArtifacts:
@@ -19,6 +28,8 @@ class BlueprintArtifacts:
     ai_summary: str
     cpp_header: str
     cpp_source: str
+    cpp_header_path: str
+    cpp_source_path: str
     functions: list[FunctionSynopsis] = field(default_factory=list)
 
     def to_bundle(self) -> Dict[str, object]:
@@ -31,8 +42,10 @@ class BlueprintArtifacts:
             "metadata": {
                 "name": self.report.metadata.name,
                 "parent_class": self.report.metadata.parent_class,
+                "cpp_class": self.report.metadata.cpp_class_name,
                 "variables": len(self.report.variables),
                 "graphs": len(self.report.graphs),
+                "formats": AVAILABLE_FORMATS,
             },
             "markdown": self.markdown,
             "json": payload,
@@ -40,6 +53,8 @@ class BlueprintArtifacts:
             "cpp": {
                 "header": self.cpp_header,
                 "source": self.cpp_source,
+                "header_path": self.cpp_header_path,
+                "source_path": self.cpp_source_path,
             },
         }
 

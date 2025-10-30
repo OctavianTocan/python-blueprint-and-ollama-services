@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Sequence
 
+from ..cpp_utils import header_path, source_path
 from ..models import BlueprintReport, FunctionSynopsis
 
 
@@ -14,32 +15,25 @@ class CppArtifacts:
 
     header: str
     source: str
+    header_path: str
+    source_path: str
 
 
 def generate_unreal_cpp(report: BlueprintReport) -> CppArtifacts:
     """Produce Unreal-friendly header and source snippets."""
 
-    class_name = _derive_class_name(report.metadata.name, report.metadata.parent_class)
+    class_name = report.metadata.cpp_class_name
     header_includes = _gather_header_includes(report.metadata.parent_class)
     header_text = _build_header(report, class_name, header_includes)
     source_text = _build_source(report, class_name)
-    return CppArtifacts(header=header_text, source=source_text)
-
-
-def _derive_class_name(name: str, parent_class: str | None) -> str:
-    """Infer Unreal class name prefix from parent class."""
-
-    prefix = "U"
-    if parent_class:
-        if parent_class.endswith("Actor"):
-            prefix = "A"
-        elif parent_class.endswith("Component"):
-            prefix = "U"
-        elif parent_class.endswith("Widget"):
-            prefix = "U"
-        elif parent_class.endswith("Controller"):
-            prefix = "A"
-    return f"{prefix}{name}" if not name.startswith(prefix) else name
+    header_location = header_path(report.metadata.name)
+    source_location = source_path(report.metadata.name)
+    return CppArtifacts(
+        header=header_text,
+        source=source_text,
+        header_path=header_location,
+        source_path=source_location,
+    )
 
 
 def _gather_header_includes(parent_class: str | None) -> List[str]:
