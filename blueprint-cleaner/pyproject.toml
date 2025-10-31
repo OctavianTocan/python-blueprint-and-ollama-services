@@ -7,7 +7,7 @@ authors = [
     { name = "Octavian Tocan", email = "tocanoctavian@gmail.com" }
 ]
 requires-python = ">=3.13"
-dependencies = ["toolkit"]
+dependencies = ["toolkit", "ollama-service"]
 
 [project.scripts]
 blueprint-cleaner = "blueprint_cleaner.cli:main"
@@ -23,3 +23,4 @@ package = true
 [tool.uv.sources]
 toolkit = { path = "../", editable = true }
 blueprint_cleaner = { path = "src" }
+ollama_service = { path = "../ollama_service/src", editable = true }

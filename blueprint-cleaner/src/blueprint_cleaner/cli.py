@@ -29,6 +29,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  %(prog)s input.copy\n"
             "  %(prog)s input.copy -o cleaned.md\n"
             "  %(prog)s input.copy --format json\n"
+            "  %(prog)s input.copy -s ollama  # use Ollama instead of Pieces\n"
             "  %(prog)s input.copy -d  # debug mode with detailed logs"
         ),
     )
@@ -50,6 +51,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--debug",
         action="store_true",
         help="Enable debug mode with detailed logs",
+    )
+    parser.add_argument(
+        "-s",
+        "--service",
+        choices=["pieces", "ollama"],
+        default="pieces",
+        help="AI service to use for summarization (default: pieces)",
     )
     return parser
 
@@ -82,6 +90,7 @@ def main(argv: list[str] | None = None) -> None:
         8192,
         format_choice,
         args.debug,
+        service=args.service,
     )
     if success:
         print(f"\nOutput saved to: {output_path}")
