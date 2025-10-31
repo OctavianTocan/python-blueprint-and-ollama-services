@@ -54,6 +54,7 @@ app = FastAPI(
 if FastMCP is not None:
     mcp = FastMCP.from_fastapi(app=app)
 
+
 @app.post("/ollama/ask", response_model=OllamaResponse)
 async def post_ask(request: OllamaRequest) -> OllamaResponse:
     """Ask Ollama a question via POST request.
@@ -78,13 +79,13 @@ async def post_ask(request: OllamaRequest) -> OllamaResponse:
             endpoint=request.endpoint or "http://localhost:11434/api/generate",
             headers=request.headers,
         )
-        
+
         logger.info(f"Request {request_id}: Success, result size: {len(result)} chars")
         return OllamaResponse(
             result=result,
             model=request.model,
             done=True,
-            metadata={"request_id": request_id}
+            metadata={"request_id": request_id},
         )
     except Exception as exc:
         logger.error(f"Request {request_id}: Error: {exc}")
@@ -117,13 +118,10 @@ async def get_ask(
             model=model,
             system=system,
         )
-        
+
         logger.info(f"Request {request_id}: Success, result size: {len(result)} chars")
         return OllamaResponse(
-            result=result,
-            model=model,
-            done=True,
-            metadata={"request_id": request_id}
+            result=result, model=model, done=True, metadata={"request_id": request_id}
         )
     except Exception as exc:
         logger.error(f"Request {request_id}: Error: {exc}")
@@ -137,4 +135,3 @@ async def health_check() -> dict[str, str]:
     @return: Health status.
     """
     return {"status": "healthy", "service": "ollama-service"}
-

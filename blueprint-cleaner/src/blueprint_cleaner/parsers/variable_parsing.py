@@ -101,15 +101,16 @@ def parse_subcategory_object(entry: str) -> Optional[str]:
     @return: Cleaned class/struct name or None.
     """
     patterns = [
-        r'PinSubCategoryObject=([^,]+)',
-        r'SubCategoryObject=([^,]+)',
+        r"PinSubCategoryObject=([^,]+)",
+        r"SubCategoryObject=([^,]+)",
     ]
 
     for pattern in patterns:
         match = re.search(pattern, entry)
         if match:
             from toolkit.text_parsing import extract_tail_identifier
-            raw_value = match.group(1).rstrip(')')
+
+            raw_value = match.group(1).rstrip(")")
             return extract_tail_identifier(raw_value)
 
     return None

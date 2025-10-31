@@ -78,7 +78,9 @@ def _determine_max_chunk(total_length: int, chunk_size: int) -> int:
 def _prepare_paragraphs(document: str, max_segment: int) -> List[str]:
     """Split document into paragraphs, breaking long ones as needed."""
 
-    raw_paragraphs = [paragraph.strip() for paragraph in document.split("\n\n") if paragraph.strip()]
+    raw_paragraphs = [
+        paragraph.strip() for paragraph in document.split("\n\n") if paragraph.strip()
+    ]
     if not raw_paragraphs:
         raw_paragraphs = [document.strip()]
 

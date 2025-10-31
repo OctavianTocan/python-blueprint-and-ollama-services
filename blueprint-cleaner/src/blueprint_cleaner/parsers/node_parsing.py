@@ -25,8 +25,8 @@ def classify_node_kind(node_name: str) -> str:
     @return: Simplified node type (e.g., "VariableGet", "Comment").
     """
     if node_name.startswith("K2Node_"):
-        tail = node_name[len("K2Node_"):]
-        return tail.split('_')[0]
+        tail = node_name[len("K2Node_") :]
+        return tail.split("_")[0]
     if node_name.startswith("EdGraphNode_Comment"):
         return "Comment"
     return node_name

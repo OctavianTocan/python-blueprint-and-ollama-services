@@ -22,4 +22,3 @@ def render_output(artifacts: BlueprintArtifacts, format_type: str) -> str:
     if fmt == "cpp-source":
         return artifacts.cpp_source
     return artifacts.markdown
-

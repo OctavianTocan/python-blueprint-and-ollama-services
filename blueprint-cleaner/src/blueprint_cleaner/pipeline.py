@@ -133,8 +133,10 @@ def _default_summariser(service: str = "pieces") -> SummaryFn:
     """
     if service == "ollama":
         from ollama_service.client import ask_ollama_question
+
         return ask_ollama_question
-    
+
     # Default to pieces
     from pieces_service.client import ask_copilot_question
+
     return ask_copilot_question

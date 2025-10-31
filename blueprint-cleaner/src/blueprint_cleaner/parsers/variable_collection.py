@@ -65,13 +65,13 @@ def extract_parenthesized_payload(content: str, start_index: int) -> Optional[Pa
             elif in_quote is None:
                 in_quote = char
         elif in_quote is None:
-            if char == '(':
+            if char == "(":
                 depth += 1
-            elif char == ')':
+            elif char == ")":
                 depth -= 1
         pos += 1
 
     if depth != 0:
         return None
 
-    return Payload(text=content[open_index + 2:pos - 1], next_index=pos)
+    return Payload(text=content[open_index + 2 : pos - 1], next_index=pos)

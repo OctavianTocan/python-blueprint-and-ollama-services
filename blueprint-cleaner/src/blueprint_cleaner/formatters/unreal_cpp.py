@@ -83,14 +83,16 @@ def _resolve_parent_cpp_class(parent_class: str | None) -> str:
     return parent_class
 
 
-def _build_header(report: BlueprintReport, class_name: str, includes: Sequence[str]) -> str:
+def _build_header(
+    report: BlueprintReport, class_name: str, includes: Sequence[str]
+) -> str:
     """Compose header file text."""
 
     lines: List[str] = ["#pragma once", ""]
     for include in includes:
-        lines.append(f"#include \"{include}\"")
+        lines.append(f'#include "{include}"')
     lines.append("")
-    lines.append(f"#include \"{report.metadata.name}.generated.h\"")
+    lines.append(f'#include "{report.metadata.name}.generated.h"')
     lines.append("")
     lines.append("UCLASS(BlueprintType)")
     parent = _resolve_parent_cpp_class(report.metadata.parent_class)
@@ -106,7 +108,7 @@ def _build_header(report: BlueprintReport, class_name: str, includes: Sequence[s
         comment = synopsis.description.replace("\n", " ")
         lines.append("")
         lines.append(f"    /** {comment} */")
-        lines.append("    UFUNCTION(BlueprintCallable, Category=\"BlueprintCleaner\")")
+        lines.append('    UFUNCTION(BlueprintCallable, Category="BlueprintCleaner")')
         lines.append(f"    void {prototype};")
 
     lines.append("};")
@@ -116,7 +118,7 @@ def _build_header(report: BlueprintReport, class_name: str, includes: Sequence[s
 def _build_source(report: BlueprintReport, class_name: str) -> str:
     """Compose source file text."""
 
-    body: List[str] = [f"#include \"{report.metadata.name}.h\"", ""]
+    body: List[str] = [f'#include "{report.metadata.name}.h"', ""]
     body.append(f"{class_name}::{class_name}()")
     body.append("{")
     body.append("    PrimaryActorTick.bCanEverTick = false;")
@@ -124,7 +126,11 @@ def _build_source(report: BlueprintReport, class_name: str) -> str:
 
     for synopsis in report.functions:
         prototype = _function_signature(synopsis)
-        qualified = f"void {class_name}::{prototype[:-2]}" if prototype.endswith("()") else f"void {class_name}::{prototype}"
+        qualified = (
+            f"void {class_name}::{prototype[:-2]}"
+            if prototype.endswith("()")
+            else f"void {class_name}::{prototype}"
+        )
         body.extend(["", f"{qualified}()", "{"])
         body.extend(_emit_function_body(synopsis))
         body.append("}")
@@ -142,10 +148,7 @@ def _sanitize_identifier(name: str) -> str:
     """Sanitize blueprint names into valid C++ identifiers."""
 
     sanitized = (
-        name.replace("::", "_")
-        .replace(" ", "_")
-        .replace("-", "_")
-        .replace("/", "_")
+        name.replace("::", "_").replace(" ", "_").replace("-", "_").replace("/", "_")
     )
     return sanitized
 

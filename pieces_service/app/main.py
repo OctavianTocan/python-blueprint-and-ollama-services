@@ -57,7 +57,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Copilot Service",
     description="HTTP wrapper for Pieces SDK Copilot",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 
@@ -112,6 +112,7 @@ async def get_ask(prompt: str) -> dict:
     except Exception as e:
         logger.error(f"Request {request_id}: Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 # Create and mount the MCP server
 mcp = FastApiMCP(app)

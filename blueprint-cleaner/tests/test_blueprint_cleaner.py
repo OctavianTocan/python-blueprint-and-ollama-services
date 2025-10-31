@@ -82,7 +82,9 @@ def test_generate_artifacts_exposes_all_required_outputs():
 
     # AI summary should derive from batch prompts.
     assert artifacts.ai_summary.startswith("<summary-")
-    assert len(prompts) >= 2, "Rolling summary should invoke summariser for multiple batches"
+    assert len(prompts) >= 2, (
+        "Rolling summary should invoke summariser for multiple batches"
+    )
 
     # Generated C++ scaffolding must include professional UE boilerplate.
     assert artifacts.cpp_header.startswith("#pragma once")
@@ -126,7 +128,9 @@ def test_generate_bundled_output_returns_json_bundle(tmp_path):
 
 
 @pytest.mark.parametrize("chunk_size, expected_calls", [(80, 3), (400, 1)])
-def test_rolling_summary_batches_respect_chunk_size(chunk_size: int, expected_calls: int) -> None:
+def test_rolling_summary_batches_respect_chunk_size(
+    chunk_size: int, expected_calls: int
+) -> None:
     """Rolling summaries should chunk long documents while keeping short ones single-pass."""
 
     from blueprint_cleaner.summaries import generate_rolling_summary

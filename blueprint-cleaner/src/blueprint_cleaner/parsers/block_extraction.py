@@ -29,7 +29,7 @@ def collect_graph_blocks(lines: Sequence[str]) -> List[GraphBlock]:
             start_index, name = stack.pop()
             if should_skip_block(name):
                 continue
-            block_lines = lines[start_index:index + 1]
+            block_lines = lines[start_index : index + 1]
             if is_graph_block(block_lines):
                 blocks.append(GraphBlock(name=name, lines=block_lines))
 
@@ -43,6 +43,7 @@ def extract_name_from_begin_object(line: str) -> str | None:
     @return: Extracted name or None if not found.
     """
     import re
+
     match = re.search(r'Name="([^"]+)"', line)
     return match.group(1) if match else None
 
@@ -85,7 +86,7 @@ def collect_node_blocks(block: GraphBlock) -> list[NodeBlock]:
         elif stripped == "End Object" and stack:
             start, header, name = stack.pop()
             if is_node_block(name):
-                node_lines = lines[start:index + 1]
+                node_lines = lines[start : index + 1]
                 nodes.append(NodeBlock(name=name, header=header, lines=node_lines))
 
     return nodes

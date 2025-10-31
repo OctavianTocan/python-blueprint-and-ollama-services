@@ -43,14 +43,14 @@ def extract_tail_identifier(raw: Optional[str]) -> Optional[str]:
     """
     if not raw:
         return None
-    cleaned = raw.replace('"', '')
+    cleaned = raw.replace('"', "")
     if "'" in cleaned:
         cleaned = cleaned.split("'", 1)[-1]
     cleaned = cleaned.replace("'", "")
-    cleaned = cleaned.split('.')[-1]
-    cleaned = cleaned.split('/')[-1]
+    cleaned = cleaned.split(".")[-1]
+    cleaned = cleaned.split("/")[-1]
     cleaned = cleaned.replace("SKEL_", "").replace("REINST_", "")
-    result = cleaned.rstrip('_C')
+    result = cleaned.rstrip("_C")
     return result or cleaned
 
 

@@ -46,7 +46,11 @@ def test_clean_blueprint_bundle_returns_cpp_artifacts(client: TestClient) -> Non
     """Bundle responses should be JSON with AI summary and C++ header/source."""
 
     files = {
-        "file": ("BP_Test.COPY", BytesIO(BLUEPRINT_SAMPLE.encode("utf-8")), "text/plain"),
+        "file": (
+            "BP_Test.COPY",
+            BytesIO(BLUEPRINT_SAMPLE.encode("utf-8")),
+            "text/plain",
+        ),
     }
 
     response = client.post(

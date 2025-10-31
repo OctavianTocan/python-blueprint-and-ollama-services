@@ -36,7 +36,9 @@ class BlueprintArtifacts:
         """Convert artifacts into a JSON-serialisable dictionary."""
 
         payload = json.loads(self.json_text)
-        payload.setdefault("functions", [self._function_to_dict(fn) for fn in self.functions])
+        payload.setdefault(
+            "functions", [self._function_to_dict(fn) for fn in self.functions]
+        )
 
         return {
             "metadata": {

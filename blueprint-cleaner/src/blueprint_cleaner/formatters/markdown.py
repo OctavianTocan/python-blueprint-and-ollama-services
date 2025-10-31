@@ -136,7 +136,9 @@ def render_graph_section(graphs: Sequence[GraphSummary]) -> str:
     return "\n".join(line for line in lines if line)
 
 
-def group_graphs_by_category(graphs: Sequence[GraphSummary]) -> dict[str, List[GraphSummary]]:
+def group_graphs_by_category(
+    graphs: Sequence[GraphSummary],
+) -> dict[str, List[GraphSummary]]:
     """Group graphs by category label.
 
     @param graphs: Graph summaries to group.

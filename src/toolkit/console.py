@@ -7,7 +7,9 @@ status, metrics, and summaries with consistent formatting.
 from __future__ import annotations
 
 
-def print_processing_header(input_path: str, output_path: str, format_type: str) -> None:
+def print_processing_header(
+    input_path: str, output_path: str, format_type: str
+) -> None:
     """Display processing configuration to console.
 
     @param input_path: Path to input file being processed.

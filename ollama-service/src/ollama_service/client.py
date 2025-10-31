@@ -47,7 +47,7 @@ def ask_ollama_question(
 
     try:
         response_text = send_ollama_request(request)
-        
+
         if not response_text.strip():
             raise RuntimeError("Ollama API returned empty response")
 
@@ -66,9 +66,9 @@ def send_ollama_request(request: OllamaRequest) -> str:
     @raises json.JSONDecodeError: On invalid JSON response.
     """
     endpoint = request.endpoint or "http://localhost:11434/api/generate"
-    
+
     payload = build_ollama_payload(request)
-    
+
     default_headers = {"Content-Type": "application/json"}
     if request.headers:
         default_headers.update(request.headers)
@@ -80,7 +80,7 @@ def send_ollama_request(request: OllamaRequest) -> str:
             headers=default_headers,
         )
         response.raise_for_status()
-        
+
         return parse_ollama_response(response.text)
 
 
@@ -107,7 +107,7 @@ def build_ollama_payload(request: OllamaRequest) -> dict:
             options_dict["num_ctx"] = request.options.num_ctx
         if request.options.num_predict != -1:
             options_dict["num_predict"] = request.options.num_predict
-        
+
         if options_dict:
             payload["options"] = options_dict
 
@@ -125,7 +125,9 @@ def parse_ollama_response(response_text: str) -> str:
     try:
         data = json.loads(response_text)
     except json.JSONDecodeError as exc:
-        raise json.JSONDecodeError(f"Invalid JSON response: {exc}", response_text, exc.pos)
+        raise json.JSONDecodeError(
+            f"Invalid JSON response: {exc}", response_text, exc.pos
+        )
 
     if "response" not in data:
         raise ValueError("Response missing 'response' field")

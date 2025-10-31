@@ -84,7 +84,9 @@ app = FastAPI(
 
 
 @app.post("/blueprint/clean", response_model=BlueprintResponse)
-async def clean_blueprint(file: UploadFile, format: str = Form("markdown")) -> BlueprintResponse:
+async def clean_blueprint(
+    file: UploadFile, format: str = Form("markdown")
+) -> BlueprintResponse:
     """Clean a blueprint .COPY file.
 
     @param file: Uploaded .COPY file.
@@ -96,7 +98,9 @@ async def clean_blueprint(file: UploadFile, format: str = Form("markdown")) -> B
     from blueprint_cleaner.pipeline import generate_blueprint_artifacts, render_output
 
     request_id = str(uuid.uuid4())
-    logger.info(f"Request {request_id}: POST /blueprint/clean, file: {file.filename}, format: {format}")
+    logger.info(
+        f"Request {request_id}: POST /blueprint/clean, file: {file.filename}, format: {format}"
+    )
 
     try:
         content = await file.read()
@@ -107,7 +111,9 @@ async def clean_blueprint(file: UploadFile, format: str = Form("markdown")) -> B
             format_choice = "markdown"
         valid_formats = set(AVAILABLE_FORMATS + ["text"])
         if format_choice not in valid_formats:
-            raise HTTPException(status_code=400, detail=f"Unsupported format '{format}'")
+            raise HTTPException(
+                status_code=400, detail=f"Unsupported format '{format}'"
+            )
         effective_format = "markdown" if format_choice == "text" else format_choice
         artifacts = generate_blueprint_artifacts(
             content_text,
@@ -184,7 +190,9 @@ def _select_summariser():
 
             return ask_copilot_question
         except Exception as exc:  # pragma: no cover - log and fall back
-            logger.warning("Pieces service unavailable, falling back to stub summariser: %s", exc)
+            logger.warning(
+                "Pieces service unavailable, falling back to stub summariser: %s", exc
+            )
 
     def _stub(prompt: str) -> str:
         return "Generated summary unavailable in offline mode."
