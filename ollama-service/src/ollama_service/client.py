@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 def ask_ollama_question(
     prompt: str,
-    model: str = "llama2",
+    model: str = "minimax-m2:cloud",
     system: Optional[str] = None,
     options: Optional[OllamaOptions] = None,
     endpoint: str = "http://localhost:11434/api/generate",

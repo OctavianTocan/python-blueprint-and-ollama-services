@@ -32,6 +32,7 @@ ollama_service/
 ### Key Components
 
 #### Client (`client.py`)
+
 - `ask_ollama_question()`: Main interface for sending prompts
 - `build_ollama_payload()`: Constructs JSON payload for Ollama API
 - `parse_ollama_response()`: Extracts response content from API
@@ -39,12 +40,14 @@ ollama_service/
 - `validate_ollama_request()`: Validates input parameters
 
 #### API (`api.py`)
+
 - `GET /ollama/ask`: Simple query interface
 - `POST /ollama/ask`: Advanced request with full options
 - `GET /health`: Health check endpoint
 - FastMCP integration (optional)
 
 #### Models (`models.py`)
+
 - `OllamaRequest`: Request configuration with validation
 - `OllamaResponse`: Response structure with metadata
 - `OllamaOptions`: Generation parameters (temperature, context, etc.)
@@ -76,7 +79,7 @@ def _default_summariser(service: str = "pieces") -> SummaryFn:
     if service == "ollama":
         from ollama_service.client import ask_ollama_question
         return ask_ollama_question
-    
+
     # Default to pieces
     from pieces_service.client import ask_copilot_question
     return ask_copilot_question
@@ -114,7 +117,7 @@ response = ask_ollama_question(
 
 ```bash
 # GET request
-curl "http://localhost:4001/ollama/ask?prompt=Hello&model=llama2"
+curl "http://localhost:4001/ollama/ask?prompt=Hello&model=minimax-m2:cloud"
 
 # POST request
 curl -X POST "http://localhost:4001/ollama/ask" \
@@ -147,15 +150,16 @@ blueprint-cleaner BP_Character.COPY -s ollama -f cpp-header
 ### Prerequisites
 
 1. **Ollama Installation**: Install and run Ollama locally
+
    ```bash
    # Install Ollama
    curl -fsSL https://ollama.ai/install.sh | sh
-   
+
    # Start Ollama service
    ollama serve
-   
+
    # Pull a model
-   ollama pull llama2
+   ollama pull minimax-m2:cloud
    ```
 
 2. **Python Environment**: Ensure Python 3.13+ with required dependencies
@@ -190,17 +194,17 @@ blueprint-cleaner input.copy -s ollama
 ### Environment Variables
 
 - `OLLAMA_ENDPOINT`: Custom Ollama API endpoint (default: `http://localhost:11434/api/generate`)
-- `OLLAMA_MODEL`: Default model to use (default: `llama2`)
+- `OLLAMA_MODEL`: Default model to use (default: `minimax-m2:cloud`)
 
 ### Service Defaults
 
-| Parameter | Pieces Service | Ollama Service |
-|------------|----------------|-----------------|
-| Default Model | Pieces OS default | `llama2` |
-| Endpoint | Pieces SDK | `http://localhost:11434/api/generate` |
-| Port | 4000 | 4001 |
-| Temperature | N/A | 0.7 |
-| Context Window | N/A | 2048 tokens |
+| Parameter      | Pieces Service    | Ollama Service                        |
+| -------------- | ----------------- | ------------------------------------- |
+| Default Model  | Pieces OS default | `minimax-m2:cloud`                    |
+| Endpoint       | Pieces SDK        | `http://localhost:11434/api/generate` |
+| Port           | 4000              | 4001                                  |
+| Temperature    | N/A               | 0.7                                   |
+| Context Window | N/A               | 2048 tokens                           |
 
 ## Testing
 
@@ -248,7 +252,7 @@ blueprint-cleaner test_data/sample.COPY -s ollama -d
 ### Migration Steps
 
 1. **Install Ollama**: Set up local Ollama service
-2. **Pull Models**: Download desired models (`ollama pull llama2`)
+2. **Pull Models**: Download desired models (`ollama pull minimax-m2:cloud`)
 3. **Update Workflows**: Add `-s ollama` to blueprint-cleaner commands
 4. **Validate Results**: Compare output quality with Pieces service
 5. **Configure Models**: Choose optimal models for specific tasks

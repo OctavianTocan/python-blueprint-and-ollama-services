@@ -1,6 +1,8 @@
 # TODO: Update README.md with correct information on how to use FastMCP integration, and the FastAPI. They're not meant to be used the way this README currently describes. Check:
+
 https://gofastmcp.com/integrations/fastapi
 https://fastapi.tiangolo.com/#run-it
+
 # Ollama Service
 
 HTTP API wrapper for Ollama providing LLM query capabilities with FastMCP integration.
@@ -37,7 +39,7 @@ The service runs on port 4001 by default.
 #### GET Request
 
 ```bash
-curl "http://localhost:4001/ollama/ask?prompt=Hello%20world&model=llama2"
+curl "http://localhost:4001/ollama/ask?prompt=Hello%20world&model=minimax-m2:cloud"
 ```
 
 #### POST Request
@@ -47,7 +49,7 @@ curl -X POST "http://localhost:4001/ollama/ask" \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "Explain quantum computing",
-    "model": "llama2",
+    "model": "minimax-m2:cloud",
     "system": "You are a helpful assistant.",
     "options": {
       "temperature": 0.7,
@@ -63,7 +65,7 @@ from ollama_service.client import ask_ollama_question
 
 response = ask_ollama_question(
     prompt="Explain machine learning",
-    model="llama2",
+    model="minimax-m2:cloud",
     system="You are a helpful assistant."
 )
 print(response)
@@ -74,7 +76,7 @@ print(response)
 ### Environment Variables
 
 - `OLLAMA_ENDPOINT`: Ollama API endpoint (default: `http://localhost:11434/api/generate`)
-- `OLLAMA_MODEL`: Default model to use (default: `llama2`)
+- `OLLAMA_MODEL`: Default model to use (default: `minimax-m2:cloud`)
 
 ### Request Options
 

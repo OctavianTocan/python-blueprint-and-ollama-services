@@ -95,13 +95,13 @@ async def post_ask(request: OllamaRequest) -> OllamaResponse:
 @app.get("/ollama/ask", response_model=OllamaResponse)
 async def get_ask(
     prompt: str,
-    model: str = "llama2",
+    model: str = "minimax-m2:cloud",
     system: str | None = None,
 ) -> OllamaResponse:
     """Ask Ollama a question via GET request.
 
     @param prompt: Question query parameter.
-    @param model: Model name (default: llama2).
+    @param model: Model name (default: minimax-m2:cloud).
     @param system: Optional system prompt.
     @return: Response with Ollama result.
     @raises HTTPException: On Ollama error.
