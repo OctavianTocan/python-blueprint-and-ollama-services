@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "ollama-service",
+    "pieces-service",
     "toolkit",
 ]
 
@@ -26,6 +27,7 @@ package = true
 [tool.uv.sources]
 ollama-service = { path = "../ollama-service", editable = true }
 toolkit = { path = "../", editable = true }
+pieces-service = { path = "../pieces-service", editable = true }
 
 [dependency-groups]
 dev = [

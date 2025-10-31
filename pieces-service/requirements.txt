@@ -1,4 +1,0 @@
-fastapi
-uvicorn[standard]
-pieces_os_client
-pydantic>=2.0.0,<3.0.0
