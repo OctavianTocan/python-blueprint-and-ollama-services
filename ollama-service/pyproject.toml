@@ -7,12 +7,12 @@ authors = [
     {name = "Octavian Tocan", email = "tocanoctavian@gmail.com"}
 ]
 dependencies = [
-    "fastapi",
-    "fastapi-mcp",
-    "uvicorn[standard]",
-    "httpx",
-    "pydantic",
-    "structlog",
+    "fastmcp>=2.13.0.2",
+    "pydantic>=2.12.3",
+    "structlog>=25.5.0",
+    "httpx>=0.28.1",
+    "fastapi>=0.120.4",
+    "uvicorn[standard]>=0.38.0",
 ]
 requires-python = ">=3.13"
 
