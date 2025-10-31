@@ -129,4 +129,11 @@ def _default_summariser() -> SummaryFn:
     @return: Summariser function.
     """
     from ollama_service.client import ask_ollama_question
-    return ask_ollama_question
+    from ollama_service.models import OllamaOptions
+
+    options = OllamaOptions(num_predict=320)
+
+    def _summarise(prompt: str) -> str:
+        return ask_ollama_question(prompt, options=options)
+
+    return _summarise

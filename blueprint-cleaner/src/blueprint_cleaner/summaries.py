@@ -27,6 +27,15 @@ def generate_rolling_summary(
     summary = ""
     for index, chunk in enumerate(chunks, start=1):
         prompt = _build_summary_prompt(summary, chunk, index, len(chunks))
+        # TODO: OLLAMA can return an empty response sometimes; handle that case better, and make a test for it:
+        #           File "C:\Users\tocanoctavian\Desktop\PARA\1-Projects\Utils\blueprint-cleaner\src\blueprint_cleaner\summaries.py", line 30, in generate_rolling_summary
+        #     summary = summariser(prompt).strip()
+        #               ~~~~~~~~~~^^^^^^^^
+        #   File "C:\Users\tocanoctavian\Desktop\PARA\1-Projects\Utils\blueprint-cleaner\src\blueprint_cleaner\pipeline.py", line 137, in _summarise
+        #     return ask_ollama_question(prompt, options=options)
+        #   File "C:\Users\tocanoctavian\Desktop\PARA\1-Projects\Utils\ollama-service\src\ollama_service\client.py", line 57, in ask_ollama_question
+        #     raise RuntimeError(f"Failed to get response from Ollama: {exc}")
+        # RuntimeError: Failed to get response from Ollama: Ollama API returned empty response
         summary = summariser(prompt).strip()
     return summary
 
@@ -138,7 +147,6 @@ def _build_summary_prompt(previous: str, chunk: str, index: int, total: int) -> 
         return (
             f"{header}\n\nPrevious summary:\n{previous}\n\n"
             f"New content:\n{chunk}\n\nUpdate the summary with key logic, calls, and variables "
-            "while staying under 250 tokens."
         )
 
     return (

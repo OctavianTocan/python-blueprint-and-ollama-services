@@ -16,6 +16,9 @@ from .models import OllamaOptions, OllamaRequest, OllamaResponse
 
 logger = logging.getLogger(__name__)
 
+# TODO: Replace this custom HTTP client with the official Ollama Python SDK
+# (https://github.com/ollama/ollama-python) to stay aligned with upstream features.
+
 
 def ask_ollama_question(
     prompt: str,

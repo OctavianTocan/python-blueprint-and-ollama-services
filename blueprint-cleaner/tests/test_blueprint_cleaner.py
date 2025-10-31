@@ -82,9 +82,9 @@ def test_generate_artifacts_exposes_all_required_outputs():
 
     # AI summary should derive from batch prompts.
     assert artifacts.ai_summary.startswith("<summary-")
-    assert len(prompts) >= 2, (
-        "Rolling summary should invoke summariser for multiple batches"
-    )
+    assert (
+        len(prompts) >= 2
+    ), "Rolling summary should invoke summariser for multiple batches"
 
     # Generated C++ scaffolding must include professional UE boilerplate.
     assert artifacts.cpp_header.startswith("#pragma once")
@@ -125,6 +125,36 @@ def test_generate_bundled_output_returns_json_bundle(tmp_path):
     assert cpp_bundle["source"].startswith('#include "BP_Test.h"')
     assert cpp_bundle["header_path"] == "Source/Game/BP_Test.h"
     assert cpp_bundle["source_path"] == "Source/Game/BP_Test.cpp"
+
+
+def test_default_summariser_applies_llm_token_cap(monkeypatch):
+    """Default summariser should limit token budget for blueprint summaries."""
+
+    captured: dict[str, object] = {}
+
+    def _fake_ask(
+        prompt: str,
+        model: str = "minimax-m2:cloud",
+        system: str | None = None,
+        options=None,
+        endpoint: str = "http://localhost:11434/api/generate",
+        headers: dict | None = None,
+    ) -> str:
+        captured["prompt"] = prompt
+        captured["options"] = options
+        return "<ok>"
+
+    monkeypatch.setattr("ollama_service.client.ask_ollama_question", _fake_ask)
+
+    from blueprint_cleaner.pipeline import _default_summariser
+
+    summariser = _default_summariser()
+    result = summariser("Summarise this, please.")
+
+    assert result == "<ok>"
+    assert captured["prompt"].startswith("Summarise")
+    assert captured["options"] is not None
+    assert getattr(captured["options"], "num_predict", None) == 320
 
 
 @pytest.mark.parametrize("chunk_size, expected_calls", [(80, 3), (400, 1)])
