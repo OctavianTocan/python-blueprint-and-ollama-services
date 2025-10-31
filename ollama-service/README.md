@@ -1,3 +1,6 @@
+# TODO: Update README.md with correct information on how to use FastMCP integration, and the FastAPI. They're not meant to be used the way this README currently describes. Check:
+https://gofastmcp.com/integrations/fastapi
+https://fastapi.tiangolo.com/#run-it
 # Ollama Service
 
 HTTP API wrapper for Ollama providing LLM query capabilities with FastMCP integration.
