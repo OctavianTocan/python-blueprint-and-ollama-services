@@ -18,7 +18,7 @@ from .models import OllamaRequest, OllamaResponse
 
 # Optional FastMCP integration
 try:
-    from fastapi_mcp import FastMCP
+    from fastmcp import FastMCP
 except ImportError:
     FastMCP = None
 
@@ -50,6 +50,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Convert to MCP server
+if FastMCP is not None:
+    mcp = FastMCP.from_fastapi(app=app)
 
 @app.post("/ollama/ask", response_model=OllamaResponse)
 async def post_ask(request: OllamaRequest) -> OllamaResponse:
@@ -135,8 +138,3 @@ async def health_check() -> dict[str, str]:
     """
     return {"status": "healthy", "service": "ollama-service"}
 
-
-# Mount FastMCP server if available
-if FastMCP is not None:
-    mcp = FastMCP(app)
-    mcp.mount()

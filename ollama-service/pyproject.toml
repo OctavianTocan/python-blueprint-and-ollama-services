@@ -11,8 +11,8 @@ dependencies = [
     "pydantic>=2.12.3",
     "structlog>=25.5.0",
     "httpx>=0.28.1",
-    "fastapi>=0.120.4",
     "uvicorn[standard]>=0.38.0",
+    "fastapi[standard]>=0.120.4",
 ]
 requires-python = ">=3.13"
 
