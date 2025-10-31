@@ -7,7 +7,9 @@ authors = [
     { name = "Octavian Tocan", email = "tocanoctavian@gmail.com" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "ollama-service",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -18,3 +20,16 @@ packages = ["src/toolkit"]
 
 [tool.hatch.build.targets.sdist]
 include = ["src/toolkit"]
+
+[tool.uv.workspace]
+members = [
+    "ollama-service",
+]
+
+[tool.uv.sources]
+ollama-service = { workspace = true, editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]

@@ -4,10 +4,13 @@ version = "0.1.0"
 description = "Generate AI-ready summaries from Unreal Engine blueprint COPY exports."
 readme = "README.md"
 authors = [
-    { name = "Octavian Tocan", email = "tocanoctavian@gmail.com" }
+    { name = "Octavian Tocan", email = "contact@octaviantocan.com" }
 ]
 requires-python = ">=3.13"
-dependencies = ["toolkit", "ollama-service"]
+dependencies = [
+    "ollama-service",
+    "toolkit",
+]
 
 [project.scripts]
 blueprint-cleaner = "blueprint_cleaner.cli:main"
@@ -21,6 +24,5 @@ build-backend = "uv_build"
 package = true
 
 [tool.uv.sources]
+ollama-service = { path = "../ollama-service", editable = true }
 toolkit = { path = "../", editable = true }
-blueprint_cleaner = { path = "src" }
-ollama_service = { path = "../ollama_service/src", editable = true }
