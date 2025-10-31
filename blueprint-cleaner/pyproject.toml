@@ -26,3 +26,8 @@ package = true
 [tool.uv.sources]
 ollama-service = { path = "../ollama-service", editable = true }
 toolkit = { path = "../", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]
