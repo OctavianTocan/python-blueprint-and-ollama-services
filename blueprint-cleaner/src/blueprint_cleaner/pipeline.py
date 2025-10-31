@@ -95,7 +95,6 @@ def clean_blueprint_file(
     format_type: str = "markdown",
     debug: bool = False,
     summariser: Optional[SummaryFn] = None,
-    service: str = "pieces",
 ) -> bool:
     """Generate AI-focused summary for a UE5 blueprint file."""
 
@@ -109,7 +108,7 @@ def clean_blueprint_file(
         content = read_text_file(input_file)
         artifacts = generate_blueprint_artifacts(
             content,
-            summariser=summariser or _default_summariser(service),
+            summariser=summariser or _default_summariser(),
             summary_chunk_size=chunk_size,
             debug=debug,
         )
@@ -125,18 +124,9 @@ def clean_blueprint_file(
         return False
 
 
-def _default_summariser(service: str = "pieces") -> SummaryFn:
-    """Create a summariser callable based on service choice.
-
-    @param service: Service to use ("pieces" or "ollama").
+def _default_summariser() -> SummaryFn:
+    """Create a summariser callback using the default LLM service.
     @return: Summariser function.
     """
-    if service == "ollama":
-        from ollama_service.client import ask_ollama_question
-
-        return ask_ollama_question
-
-    # Default to pieces
-    from pieces_service.client import ask_copilot_question
-
-    return ask_copilot_question
+    from ollama_service.client import ask_ollama_question
+    return ask_ollama_question
