@@ -14,27 +14,17 @@ Transform Unreal Engine 5 blueprint `.COPY` files into AI-friendly summaries.
 
 [→ Documentation](./blueprint-cleaner/README.md)
 
-### 2. **pieces-service**
+### 2. **ollama-service**
 
-HTTP wrapper for Pieces SDK Copilot with FastAPI and FastMCP integration.
+HTTP wrapper for Ollama with FastAPI and FastMCP integration.
 
-- **Purpose**: Expose Pieces copilot via REST API
+- **Purpose**: Expose Ollama via REST API
 - **Features**: GET/POST endpoints, streaming responses, FastMCP
-- **Tech**: FastAPI, Pieces SDK, FastMCP
+- **Tech**: FastAPI, Ollama, FastMCP
 
-[→ Documentation](./pieces_service/README.md)
+[→ Documentation](./ollama-service/README.md)
 
-### 3. **unified-api**
-
-Combined service exposing all utilities under a single FastAPI application.
-
-- **Purpose**: Unified interface for blueprint cleaning and copilot queries
-- **Features**: Multi-service facade, file uploads, FastMCP
-- **Tech**: FastAPI, FastMCP, python-multipart
-
-[→ Documentation](./unified_api/README.md)
-
-### 4. **toolkit**
+### 3. **toolkit**
 
 Shared utilities for text parsing, file I/O, formatting, and console output.
 
@@ -95,13 +85,9 @@ cd blueprint-cleaner
 uv sync
 uv run blueprint-cleaner --help
 
-cd ../pieces_service
+cd ../ollama-service
 uv sync
-uv run uvicorn pieces_service.api:app --reload --port 4000
-
-cd ../unified_api
-uv sync
-uv run uvicorn unified_api.main:app --reload --port 8000
+uv run uvicorn ollama_service.api:app --reload --port 4001
 ```
 
 ### Dependencies
@@ -111,7 +97,6 @@ Projects declare local dependencies via `tool.uv.sources`:
 ```toml
 [tool.uv.sources]
 toolkit = { path = "../", editable = true }
-blueprint-cleaner = { path = "../blueprint-cleaner", editable = true }
 ```
 
 ## Documentation

@@ -1,40 +1,40 @@
-# TODO: Update README.md with correct information on how to use FastMCP integration, and the FastAPI. They're not meant to be used the way this README currently describes. Check:
-
-https://gofastmcp.com/integrations/fastapi
-https://fastapi.tiangolo.com/#run-it
-
 # Ollama Service
 
 HTTP API wrapper for Ollama providing LLM query capabilities with FastMCP integration.
 
 ## Features
 
-- HTTP REST API (GET/POST endpoints)
-- FastMCP integration for tool compatibility
-- Configurable models and generation options
-- Structured logging and monitoring
-- Health check endpoints
-- Async/await support
+- **HTTP REST API**: GET/POST endpoints for Ollama queries
+- **FastMCP Integration**: Optional compatibility layer for FastMCP
+- **Configurable**: Models, endpoints, and generation options
+- **Structured Logging**: For monitoring and debugging
+- **Health Checks**: `/health` endpoint for service monitoring
+- **Async Support**: Built with modern `async/await`
 
-## Installation
+## Quick Start
+
+### Installation
 
 ```bash
-pip install -e .
+# Navigate to the service directory
+cd ollama-service
+
+# Install dependencies with uv
+uv sync
+```
+
+### Running the Service
+
+```bash
+# Run with uvicorn
+uv run uvicorn ollama_service.api:app --reload --port 4001
 ```
 
 ## Usage
 
-### CLI
-
-Start the service:
-
-```bash
-ollama-service
-```
-
 ### HTTP API
 
-The service runs on port 4001 by default.
+The service runs on port `4001` by default.
 
 #### GET Request
 
@@ -50,15 +50,13 @@ curl -X POST "http://localhost:4001/ollama/ask" \
   -d '{
     "prompt": "Explain quantum computing",
     "model": "minimax-m2:cloud",
-    "system": "You are a helpful assistant.",
-    "options": {
-      "temperature": 0.7,
-      "num_ctx": 2048
-    }
+    "system": "You are a helpful assistant."
   }'
 ```
 
 ### Python Client
+
+The service includes a lightweight Python client for programmatic access.
 
 ```python
 from ollama_service.client import ask_ollama_question
@@ -71,6 +69,23 @@ response = ask_ollama_question(
 print(response)
 ```
 
+## FastMCP Integration
+
+If `fastmcp` is installed, the service automatically wraps the FastAPI app, making it compatible with FastMCP clients.
+
+```python
+# The following code in `api.py` enables the integration:
+try:
+    from fastmcp import FastMCP
+except ImportError:
+    FastMCP = None
+
+# ...
+
+if FastMCP is not None:
+    mcp = FastMCP.from_fastapi(app=app)
+```
+
 ## Configuration
 
 ### Environment Variables
@@ -80,33 +95,19 @@ print(response)
 
 ### Request Options
 
-- `temperature`: Controls randomness (0.0-1.0, default: 0.7)
+- `temperature`: Controls randomness (0.0–1.0, default: 0.7)
 - `num_ctx`: Token context window size (default: 2048)
 - `num_predict`: Maximum tokens to generate (default: -1, unlimited)
 
 ## API Endpoints
 
-- `GET /ollama/ask` - Ask a question via GET
-- `POST /ollama/ask` - Ask a question via POST
-- `GET /health` - Health check
-
-## Development
-
-### Running Tests
-
-```bash
-python -m pytest tests/
-```
-
-### Local Development
-
-```bash
-pip install -e ".[dev]"
-uvicorn ollama_service.api:app --reload --port 4001
-```
+- `GET /ollama/ask`: Ask a question via GET
+- `POST /ollama/ask`: Ask a question via POST
+- `GET /health`: Health check
 
 ## Dependencies
 
+- **toolkit**: Shared utilities for text parsing, I/O, formatting
 - FastAPI
 - httpx
 - Pydantic
@@ -116,4 +117,4 @@ uvicorn ollama_service.api:app --reload --port 4001
 
 ## License
 
-Copyright 2024, Spec-Driven AI, All Rights Reserved.
+MIT
