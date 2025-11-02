@@ -1,40 +1,44 @@
-# TODO: Update README.md with correct information on how to use FastMCP integration, and the FastAPI. They're not meant to be used the way this README currently describes. Check:
-
-https://gofastmcp.com/integrations/fastapi
-https://fastapi.tiangolo.com/#run-it
-
 # Ollama Service
 
 HTTP API wrapper for Ollama providing LLM query capabilities with FastMCP integration.
 
 ## Features
 
-- HTTP REST API (GET/POST endpoints)
-- FastMCP integration for tool compatibility
-- Configurable models and generation options
-- Structured logging and monitoring
-- Health check endpoints
-- Async/await support
+- **FastAPI REST endpoints**: GET/POST for LLM queries
+- **FastMCP integration**: Tool compatibility and structured interactions
+- **Configurable models**: Support for any Ollama-compatible model
+- **Structured logging**: Request/response monitoring with structlog
+- **Health checks**: Service availability endpoints
+- **Async/await**: Non-blocking request handling
 
 ## Installation
 
 ```bash
-pip install -e .
+cd ollama-service
+uv sync
 ```
 
-## Usage
+## Quick Start
 
-### CLI
-
-Start the service:
+### Start the API Server
 
 ```bash
-ollama-service
+# Development mode with auto-reload
+uv run uvicorn ollama_service.api:app --reload --port 4001
+
+# Production mode
+uv run uvicorn ollama_service.api:app --host 0.0.0.0 --port 4001
 ```
 
-### HTTP API
+The service will be available at `http://localhost:4001`.
 
-The service runs on port 4001 by default.
+### Using the HTTP API
+
+#### Health Check
+
+```bash
+curl http://localhost:4001/health
+```
 
 #### GET Request
 
@@ -80,40 +84,137 @@ print(response)
 
 ### Request Options
 
+All generation options supported by Ollama can be passed via the `options` field:
+
 - `temperature`: Controls randomness (0.0-1.0, default: 0.7)
 - `num_ctx`: Token context window size (default: 2048)
 - `num_predict`: Maximum tokens to generate (default: -1, unlimited)
+- `top_k`: Top-k sampling parameter
+- `top_p`: Top-p (nucleus) sampling parameter
+
+See [Ollama API documentation](https://github.com/ollama/ollama/blob/main/docs/api.md) for complete options.
 
 ## API Endpoints
 
-- `GET /ollama/ask` - Ask a question via GET
-- `POST /ollama/ask` - Ask a question via POST
-- `GET /health` - Health check
+### POST /ollama/ask
+
+Ask a question to the LLM with full configuration options.
+
+**Request Body:**
+
+```json
+{
+  "prompt": "string (required)",
+  "model": "string (optional)",
+  "system": "string (optional)",
+  "options": {
+    "temperature": 0.7,
+    "num_ctx": 2048
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "response": "string"
+}
+```
+
+### GET /ollama/ask
+
+Simplified query interface using URL parameters.
+
+**Query Parameters:**
+
+- `prompt` (required): The question to ask
+- `model` (optional): Override default model
+- `system` (optional): System prompt
+
+**Response:**
+
+```json
+{
+  "response": "string"
+}
+```
+
+### GET /health
+
+Health check endpoint.
+
+**Response:**
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+## FastMCP Integration
+
+The service is designed for FastMCP compatibility, making it easy to expose as MCP tools.
+
+For FastMCP integration examples, see:
+
+- [FastMCP + FastAPI Integration](https://gofastmcp.com/integrations/fastapi)
+- [FastAPI Documentation](https://fastapi.tiangolo.com)
 
 ## Development
 
 ### Running Tests
 
 ```bash
-python -m pytest tests/
+uv run pytest tests/
 ```
 
 ### Local Development
 
 ```bash
-pip install -e ".[dev]"
-uvicorn ollama_service.api:app --reload --port 4001
+# Install with dev dependencies
+uv sync
+
+# Run with auto-reload
+uv run uvicorn ollama_service.api:app --reload --port 4001
+
+# Check logs for request/response monitoring
+```
+
+## Project Structure
+
+```
+ollama-service/
+├── src/ollama_service/
+│   ├── __init__.py
+│   ├── api.py              # FastAPI application and endpoints
+│   ├── client.py           # HTTP client for Ollama API
+│   ├── models.py           # Pydantic request/response models
+│   └── logging_config.py   # Structured logging setup
+├── tests/
+│   └── test_ollama_service.py
+├── pyproject.toml
+└── README.md
 ```
 
 ## Dependencies
 
-- FastAPI
-- httpx
-- Pydantic
-- structlog
-- uvicorn
-- fastapi-mcp (optional)
+- **FastAPI**: Modern web framework for APIs
+- **httpx**: Async HTTP client
+- **Pydantic**: Data validation and serialization
+- **structlog**: Structured logging
+- **uvicorn**: ASGI server
+- **FastMCP**: MCP integration (optional)
+
+## Architecture
+
+The service follows a clean, modular design:
+
+1. **API Layer** (`api.py`): FastAPI routes and endpoint definitions
+2. **Client Layer** (`client.py`): HTTP communication with Ollama
+3. **Models** (`models.py`): Pydantic schemas for request/response validation
+4. **Logging** (`logging_config.py`): Centralized structured logging setup
 
 ## License
 
-Copyright 2024, Spec-Driven AI, All Rights Reserved.
+MIT

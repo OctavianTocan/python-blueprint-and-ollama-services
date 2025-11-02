@@ -14,33 +14,25 @@ Transform Unreal Engine 5 blueprint `.COPY` files into AI-friendly summaries.
 
 [→ Documentation](./blueprint-cleaner/README.md)
 
-### 2. **pieces-service**
+### 2. **ollama-service**
 
-HTTP wrapper for Pieces SDK Copilot with FastAPI and FastMCP integration.
+HTTP API wrapper for Ollama providing LLM query capabilities with FastMCP integration.
 
-- **Purpose**: Expose Pieces copilot via REST API
-- **Features**: GET/POST endpoints, streaming responses, FastMCP
-- **Tech**: FastAPI, Pieces SDK, FastMCP
+- **Purpose**: Expose Ollama API via REST endpoints
+- **Features**: GET/POST endpoints, structured logging, health checks
+- **Tech**: FastAPI, httpx, FastMCP, structlog
 
-[→ Documentation](./pieces_service/README.md)
+[→ Documentation](./ollama-service/README.md)
 
-### 3. **unified-api**
-
-Combined service exposing all utilities under a single FastAPI application.
-
-- **Purpose**: Unified interface for blueprint cleaning and copilot queries
-- **Features**: Multi-service facade, file uploads, FastMCP
-- **Tech**: FastAPI, FastMCP, python-multipart
-
-[→ Documentation](./unified_api/README.md)
-
-### 4. **toolkit**
+### 3. **toolkit**
 
 Shared utilities for text parsing, file I/O, formatting, and console output.
 
 - **Purpose**: Reusable helpers across all projects
 - **Modules**: text_parsing, file_io, collections, formatting, console
 - **Tech**: Pure Python, lightweight
+
+[→ Documentation](./src/toolkit/README.md)
 
 ## Architecture
 
@@ -95,13 +87,9 @@ cd blueprint-cleaner
 uv sync
 uv run blueprint-cleaner --help
 
-cd ../pieces_service
+cd ../ollama-service
 uv sync
-uv run uvicorn pieces_service.api:app --reload --port 4000
-
-cd ../unified_api
-uv sync
-uv run uvicorn unified_api.main:app --reload --port 8000
+uv run uvicorn ollama_service.api:app --reload --port 4001
 ```
 
 ### Dependencies
@@ -111,14 +99,16 @@ Projects declare local dependencies via `tool.uv.sources`:
 ```toml
 [tool.uv.sources]
 toolkit = { path = "../", editable = true }
-blueprint-cleaner = { path = "../blueprint-cleaner", editable = true }
+ollama-service = { workspace = true, editable = true }
 ```
 
 ## Documentation
 
-- **MEMORY_CAPTURE.md**: Learnings and patterns for memory systems
-- **TESTING.md**: Test roadmap (scaffolded, not enforced)
-- Individual project READMEs with API docs and examples
+Each package includes comprehensive documentation:
+
+- Individual project READMEs with Quick Start guides
+- API documentation and usage examples
+- Architecture and design decisions
 
 ## Tools & Versions
 
@@ -135,7 +125,7 @@ blueprint-cleaner = { path = "../blueprint-cleaner", editable = true }
    ```bash
    uv init --package new-project
    cd new-project
-   # Add toolkit as dependency
+   # Add toolkit as dependency in pyproject.toml
    ```
 
 2. **Implement with clean code principles**:
@@ -143,6 +133,7 @@ blueprint-cleaner = { path = "../blueprint-cleaner", editable = true }
    - Small functions (5-10 lines)
    - Doxygen comments
    - Modular structure
+   - Single responsibility
 
 3. **Test scaffolding**:
 
@@ -152,9 +143,10 @@ blueprint-cleaner = { path = "../blueprint-cleaner", editable = true }
    ```
 
 4. **Documentation**:
-   - Rich README with Quick Start
+   - README with Quick Start
    - Architecture section
    - API examples
+   - Module documentation
 
 ## Testing
 
@@ -162,13 +154,7 @@ Tests are scaffolded but intentionally not enforced:
 
 - Structure ready for pytest
 - Placeholder tests prevent import errors
-- Will implement when ready to learn patterns
-
-See [TESTING.md](./TESTING.md) for roadmap.
-
-## Memory Systems
-
-Learnings queued for openmemory/pieces LTM in [MEMORY_CAPTURE.md](./MEMORY_CAPTURE.md).
+- Run tests: `uv run pytest`
 
 ## License
 
