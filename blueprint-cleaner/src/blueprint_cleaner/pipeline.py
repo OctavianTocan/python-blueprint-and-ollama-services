@@ -131,7 +131,9 @@ def _default_summariser() -> SummaryFn:
     from ollama_service.client import ask_ollama_question
     from ollama_service.models import OllamaOptions
 
-    options = OllamaOptions(num_predict=2000)
+    # Keep the summary concise and cost-effective by limiting generation.
+    # Tests assert this budget to be 320 tokens.
+    options = OllamaOptions(num_predict=320)
 
     def _summarise(prompt: str) -> str:
         # TODO: This throws out an error
