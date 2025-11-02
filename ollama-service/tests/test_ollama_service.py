@@ -174,6 +174,18 @@ class TestOllamaClient:
         assert result == "Hello!"
         mock_client.post.assert_called_once()
 
+    @patch("httpx.Client")
+    def test_send_ollama_request_timeout(self, mock_client_class):
+        """Test timed out HTTP request."""
+        mock_client = Mock()
+        mock_client.post.side_effect = httpx.TimeoutException("Request timed out")
+        mock_client_class.return_value.__enter__.return_value = mock_client
+
+        with pytest.raises(httpx.TimeoutException):
+            send_ollama_request(
+                request=OllamaRequest(prompt="Hello", model="minimax-m2:cloud")
+            )
+
 
 class TestOllamaModels:
     """Test cases for Ollama models."""

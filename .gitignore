@@ -1,4 +1,8 @@
 emails/
+.idea/
+references/
+.claude/
+.vscode/
 
 # Kit broadcast credentials
 .env
