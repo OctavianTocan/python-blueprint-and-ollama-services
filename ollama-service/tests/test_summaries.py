@@ -114,3 +114,19 @@ def test_rolling_summary_with_invalid_chunk_size():
             summariser=summariser,
             chunk_size=-100,
         )
+
+
+def test_rolling_summary_with_negative_overlap():
+    """Negative overlap should raise ValueError."""
+
+    from ollama_service import generate_rolling_summary
+
+    summariser, _ = make_stub_summariser()
+
+    with pytest.raises(ValueError, match="overlap must be non-negative"):
+        generate_rolling_summary(
+            "Some text",
+            summariser=summariser,
+            chunk_size=1000,
+            overlap=-1,
+        )

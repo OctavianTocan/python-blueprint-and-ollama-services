@@ -22,11 +22,13 @@ def generate_rolling_summary(
     @param chunk_size: Maximum size of each chunk.
     @param overlap: Number of characters to overlap between chunks.
     @return: Final summary text.
-    @raises ValueError: If chunk_size is not positive.
+    @raises ValueError: If chunk_size is not positive or overlap is negative.
     """
 
     if chunk_size <= 0:
         raise ValueError("chunk_size must be positive")
+    if overlap < 0:
+        raise ValueError("overlap must be non-negative")
 
     chunks = list(_chunk_document(document, chunk_size, overlap))
     if not chunks:
@@ -172,7 +174,6 @@ def _build_summary_prompt(previous: str, chunk: str, index: int, total: int) -> 
         "You are an expert summarization assistant helping condense "
         "documents into concise summaries for LLM consumption."
     )
-    chunk_header = f"Chunk {index} of {total}."
 
     if previous:
         return (
