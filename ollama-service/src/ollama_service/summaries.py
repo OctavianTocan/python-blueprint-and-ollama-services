@@ -35,8 +35,8 @@ def generate_rolling_summary(
         return ""
 
     summary = ""
-    for index, chunk in enumerate(chunks, start=1):
-        prompt = _build_summary_prompt(summary, chunk, index, len(chunks))
+    for chunk in chunks:
+        prompt = _build_summary_prompt(summary, chunk)
         summary = summariser(prompt).strip()
     return summary
 
@@ -160,13 +160,11 @@ def _apply_overlap(buffer: Deque[str], overlap: int) -> None:
         buffer.append(tail_text)
 
 
-def _build_summary_prompt(previous: str, chunk: str, index: int, total: int) -> str:
+def _build_summary_prompt(previous: str, chunk: str) -> str:
     """Compose prompt for summarizing a specific chunk.
     
     @param previous: Previous summary text.
     @param chunk: Current chunk to summarize.
-    @param index: Current chunk index (1-based).
-    @param total: Total number of chunks.
     @return: Prompt string for summarizer.
     """
 
