@@ -1,4 +1,4 @@
-"""Summarisation helpers for producing AI-sized blueprint narratives."""
+"""Text summarization using rolling window strategy."""
 
 from __future__ import annotations
 
@@ -15,33 +15,40 @@ def generate_rolling_summary(
     chunk_size: int = 4000,
     overlap: int = 200,
 ) -> str:
-    """Summarise a large document using a rolling window strategy."""
+    """Summarise large document using rolling window strategy.
+    
+    @param document: Text to summarise.
+    @param summariser: Function that summarises a chunk of text.
+    @param chunk_size: Maximum size of each chunk.
+    @param overlap: Number of characters to overlap between chunks.
+    @return: Final summary text.
+    @raises ValueError: If chunk_size is not positive or overlap is negative.
+    """
 
     if chunk_size <= 0:
         raise ValueError("chunk_size must be positive")
+    if overlap < 0:
+        raise ValueError("overlap must be non-negative")
 
     chunks = list(_chunk_document(document, chunk_size, overlap))
     if not chunks:
         return ""
 
     summary = ""
-    for index, chunk in enumerate(chunks, start=1):
-        prompt = _build_summary_prompt(summary, chunk, index, len(chunks))
-        # TODO: OLLAMA can return an empty response sometimes; handle that case better, and make a test for it:
-        #           File "C:\Users\tocanoctavian\Desktop\PARA\1-Projects\Utils\blueprint-cleaner\src\blueprint_cleaner\summaries.py", line 30, in generate_rolling_summary
-        #     summary = summariser(prompt).strip()
-        #               ~~~~~~~~~~^^^^^^^^
-        #   File "C:\Users\tocanoctavian\Desktop\PARA\1-Projects\Utils\blueprint-cleaner\src\blueprint_cleaner\pipeline.py", line 137, in _summarise
-        #     return ask_ollama_question(prompt, options=options)
-        #   File "C:\Users\tocanoctavian\Desktop\PARA\1-Projects\Utils\ollama-service\src\ollama_service\client.py", line 57, in ask_ollama_question
-        #     raise RuntimeError(f"Failed to get response from Ollama: {exc}")
-        # RuntimeError: Failed to get response from Ollama: Ollama API returned empty response
+    for chunk in chunks:
+        prompt = _build_summary_prompt(summary, chunk)
         summary = summariser(prompt).strip()
     return summary
 
 
 def _chunk_document(document: str, chunk_size: int, overlap: int) -> Iterable[str]:
-    """Yield chunked segments of the document respecting punctuation boundaries."""
+    """Yield chunked segments respecting paragraph and word boundaries.
+    
+    @param document: Text to chunk.
+    @param chunk_size: Maximum size of each chunk.
+    @param overlap: Number of characters to overlap.
+    @return: Iterator of text chunks.
+    """
 
     cleaned = document.strip()
     if not cleaned:
@@ -76,7 +83,12 @@ def _chunk_document(document: str, chunk_size: int, overlap: int) -> Iterable[st
 
 
 def _determine_max_chunk(total_length: int, chunk_size: int) -> int:
-    """Calculate an adaptive chunk ceiling based on document size."""
+    """Calculate adaptive chunk ceiling based on document size.
+    
+    @param total_length: Total length of document.
+    @param chunk_size: Base chunk size.
+    @return: Adjusted maximum chunk size.
+    """
 
     base_size = max(chunk_size, 1)
     target_chunks = max(1, math.ceil(total_length / (base_size * 2)))
@@ -85,7 +97,12 @@ def _determine_max_chunk(total_length: int, chunk_size: int) -> int:
 
 
 def _prepare_paragraphs(document: str, max_segment: int) -> List[str]:
-    """Split document into paragraphs, breaking long ones as needed."""
+    """Split document into paragraphs, breaking long ones as needed.
+    
+    @param document: Text to split.
+    @param max_segment: Maximum paragraph size.
+    @return: List of paragraph strings.
+    """
 
     raw_paragraphs = [
         paragraph.strip() for paragraph in document.split("\n\n") if paragraph.strip()
@@ -104,7 +121,12 @@ def _prepare_paragraphs(document: str, max_segment: int) -> List[str]:
 
 
 def _split_long_paragraph(paragraph: str, max_segment: int) -> Iterator[str]:
-    """Break a long paragraph into smaller segments without cutting words."""
+    """Break long paragraph into smaller segments without cutting words.
+    
+    @param paragraph: Text to split.
+    @param max_segment: Maximum segment size.
+    @return: Iterator of paragraph segments.
+    """
 
     remaining = paragraph
     while len(remaining) > max_segment:
@@ -122,7 +144,11 @@ def _split_long_paragraph(paragraph: str, max_segment: int) -> Iterator[str]:
 
 
 def _apply_overlap(buffer: Deque[str], overlap: int) -> None:
-    """Retain trailing content to provide continuity between chunks."""
+    """Retain trailing content to provide continuity between chunks.
+    
+    @param buffer: Deque buffer to modify in place.
+    @param overlap: Number of characters to retain.
+    """
 
     if overlap <= 0:
         buffer.clear()
@@ -134,23 +160,27 @@ def _apply_overlap(buffer: Deque[str], overlap: int) -> None:
         buffer.append(tail_text)
 
 
-def _build_summary_prompt(previous: str, chunk: str, index: int, total: int) -> str:
-    """Compose prompt fed to the summariser for a specific chunk."""
+def _build_summary_prompt(previous: str, chunk: str) -> str:
+    """Compose prompt for summarising a specific chunk.
+    
+    @param previous: Previous summary text.
+    @param chunk: Current chunk to summarise.
+    @return: Prompt string for summariser.
+    """
 
     header = (
-        "You are an expert Unreal Engine developer helping condense blueprint "
-        "reports into concise summaries for LLM consumption."
+        "You are an expert summarization assistant helping condense "
+        "documents into concise summaries for LLM consumption."
     )
-    chunk_header = f"Chunk {index} of {total}."
 
     if previous:
         return (
             f"{header}\n\nPrevious summary:\n{previous}\n\n"
-            f"New content:\n{chunk}\n\nUpdate the summary with key logic, calls, and variables "
+            f"New content:\n{chunk}\n\nUpdate the summary with key information."
         )
 
     return (
         f"{header}\n\n"
         f"Content:\n{chunk}\n\n"
-        "Produce a bullet list capturing gameplay purpose, key functions, and critical data."
+        "Produce a concise summary capturing the key points."
     )

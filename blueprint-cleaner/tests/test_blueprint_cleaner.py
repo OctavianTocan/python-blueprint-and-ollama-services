@@ -163,7 +163,7 @@ def test_rolling_summary_batches_respect_chunk_size(
 ) -> None:
     """Rolling summaries should chunk long documents while keeping short ones single-pass."""
 
-    from blueprint_cleaner.summaries import generate_rolling_summary
+    from ollama_service import generate_rolling_summary
 
     base_doc = "\n".join(
         f"Section {idx}: Lorem ipsum dolor sit amet." for idx in range(12)

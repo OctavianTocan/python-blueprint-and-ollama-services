@@ -7,6 +7,7 @@ import os
 import traceback
 from typing import Callable, Optional
 
+from ollama_service import generate_rolling_summary
 from toolkit.console import print_processing_header, print_success_footer
 
 from .artifacts import BlueprintArtifacts
@@ -15,7 +16,6 @@ from .formatters.markdown import format_as_markdown
 from .formatters.unreal_cpp import generate_unreal_cpp
 from .io_utils import print_report_summary, read_text_file, write_text_file
 from .report import build_blueprint_report
-from .summaries import generate_rolling_summary
 
 SummaryFn = Callable[[str], str]
 
