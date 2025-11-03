@@ -17,8 +17,8 @@ def generate_rolling_summary(
 ) -> str:
     """Summarise large document using rolling window strategy.
     
-    @param document: Text to summarize.
-    @param summariser: Function that summarizes a chunk of text.
+    @param document: Text to summarise.
+    @param summariser: Function that summarises a chunk of text.
     @param chunk_size: Maximum size of each chunk.
     @param overlap: Number of characters to overlap between chunks.
     @return: Final summary text.
@@ -42,7 +42,7 @@ def generate_rolling_summary(
 
 
 def _chunk_document(document: str, chunk_size: int, overlap: int) -> Iterable[str]:
-    """Yield chunked segments respecting punctuation boundaries.
+    """Yield chunked segments respecting paragraph and word boundaries.
     
     @param document: Text to chunk.
     @param chunk_size: Maximum size of each chunk.
@@ -161,11 +161,11 @@ def _apply_overlap(buffer: Deque[str], overlap: int) -> None:
 
 
 def _build_summary_prompt(previous: str, chunk: str) -> str:
-    """Compose prompt for summarizing a specific chunk.
+    """Compose prompt for summarising a specific chunk.
     
     @param previous: Previous summary text.
-    @param chunk: Current chunk to summarize.
-    @return: Prompt string for summarizer.
+    @param chunk: Current chunk to summarise.
+    @return: Prompt string for summariser.
     """
 
     header = (
