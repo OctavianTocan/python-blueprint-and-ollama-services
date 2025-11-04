@@ -11,7 +11,7 @@ Transform Unreal Engine 5 blueprint `.COPY` files into AI-friendly summaries.
 - **Purpose**: Parse complex blueprint exports into markdown/JSON
 - **Features**: Variable extraction, graph analysis, function call tracking
 - **Tech**: Python 3.13, uv, custom parsers
-- **Docs spotlight**: The [Unreal Blueprint Glossary](./blueprint-cleaner/README.md#unreal-blueprint-glossary) explains terms like `Begin Object`, `EdGraph`, and widget bindings so newcomers can read exports confidently.
+- **New to Blueprints?** See the [Blueprint .COPY guide](./blueprint-cleaner/README.md#understanding-blueprint-copy-files) to understand what the parser reads.
 
 [→ Documentation](./blueprint-cleaner/README.md)
 
