@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import json
+import commentjson
 import os
 import traceback
 from typing import Callable, Optional
@@ -77,7 +77,7 @@ def write_artifact_bundle(
         debug=debug,
         format_type="bundle",
     )
-    bundle_text = json.dumps(artifacts.to_bundle(), indent=2)
+    bundle_text = commentjson.dumps(artifacts.to_bundle(), indent=2)
     write_text_file(output_path, bundle_text)
 
 
@@ -88,7 +88,7 @@ def render_output(artifacts: BlueprintArtifacts, format_type: str) -> str:
     if fmt == "json":
         return artifacts.json_text
     if fmt == "bundle":
-        return json.dumps(artifacts.to_bundle(), indent=2)
+        return commentjson.dumps(artifacts.to_bundle(), indent=2)
     if fmt == "summary":
         return artifacts.ai_summary
     if fmt == "cpp-header":

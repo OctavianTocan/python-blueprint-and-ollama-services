@@ -7,7 +7,7 @@ artifacts, integrates Pieces-driven summarisation, and emits Unreal-ready C++.
 
 from __future__ import annotations
 
-import json
+import commentjson
 from dataclasses import is_dataclass
 
 import pytest
@@ -92,7 +92,7 @@ def test_generate_artifacts_exposes_all_required_outputs():
 
     # Markdown and JSON outputs must be populated and consistent.
     assert "# Blueprint: BP_Test" in artifacts.markdown
-    payload = json.loads(artifacts.json_text)
+    payload = commentjson.loads(artifacts.json_text)
     assert payload["name"] == "BP_Test"
     assert payload["cpp_class"] == "ABP_Test"
     assert payload["graphs"], "Expected serialized graphs in JSON output"
@@ -137,7 +137,7 @@ def test_widget_blueprint_reports_umg_metadata():
     assert "## UMG Animations" in markdown
     assert "## Widget Variables" in markdown
 
-    payload = json.loads(artifacts.json_text)
+    payload = commentjson.loads(artifacts.json_text)
     assert payload["widget_bindings"]
     assert payload["widget_animations"]
     assert payload["widget_variables"]
@@ -159,7 +159,7 @@ def test_generate_bundled_output_returns_json_bundle(tmp_path):
     )
 
     bundle_text = bundle_path.read_text(encoding="utf-8")
-    bundle = json.loads(bundle_text)
+    bundle = commentjson.loads(bundle_text)
 
     assert bundle["metadata"]["name"] == "BP_Test"
     assert "bundle" in bundle["metadata"]["formats"]

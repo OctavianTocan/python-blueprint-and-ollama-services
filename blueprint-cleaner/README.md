@@ -5,7 +5,7 @@ Transform Unreal Engine 5 blueprint `.COPY` files into AI-friendly summaries for
 ## Features
 
 - **Clean extraction**: Parses variables, graphs, function calls, and metadata from blueprint exports
-- **Multiple formats**: Output as Markdown or JSON
+- **Multiple formats**: Output as Markdown or JSONC (JSON with Comments)
 - **Graph insights**: Entry points, function calls, variable reads/writes, and developer comments
 - **Modular architecture**: Small, focused modules following clean code principles
 
@@ -83,7 +83,7 @@ uv run blueprint-cleaner data/in/MyBlueprint.COPY
 # Custom output
 uv run blueprint-cleaner data/in/MyBlueprint.COPY -o data/out/summary.md
 
-# JSON format
+# JSONC format (JSON with Comments)
 uv run blueprint-cleaner data/in/MyBlueprint.COPY --format json
 
 # Debug mode
@@ -208,9 +208,9 @@ _Parent Class:_ `IG_PlayerCharacter`
 ...
 ```
 
-### JSON
+### JSONC (JSON with Comments)
 
-```json
+```jsonc
 {
   "name": "BPAC_IG_PCH_Melee",
   "parent_class": "IG_PlayerCharacter",

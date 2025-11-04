@@ -105,7 +105,7 @@ The other `.COPY` files in this directory are real-world exports from a game pro
 uv run blueprint-cleaner data/in/EXAMPLE_BP_SimpleCharacter.COPY -f markdown
 ```
 
-### View as JSON:
+### View as JSONC (JSON with Comments):
 
 ```bash
 uv run blueprint-cleaner data/in/EXAMPLE_WBP_SimpleUI.COPY -f json
@@ -116,7 +116,7 @@ uv run blueprint-cleaner data/in/EXAMPLE_WBP_SimpleUI.COPY -f json
 ```bash
 # Generate all formats for a simple example
 uv run blueprint-cleaner data/in/EXAMPLE_BP_GameSettings.COPY -f markdown -o /tmp/gs.md
-uv run blueprint-cleaner data/in/EXAMPLE_BP_GameSettings.COPY -f json -o /tmp/gs.json
+uv run blueprint-cleaner data/in/EXAMPLE_BP_GameSettings.COPY -f json -o /tmp/gs.jsonc
 ```
 
 ---

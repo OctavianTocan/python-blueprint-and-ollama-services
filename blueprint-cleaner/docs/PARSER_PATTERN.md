@@ -203,7 +203,7 @@ def render_json_output(report: BlueprintReport) -> str:
         "graphs": [_graph_to_dict(g) for g in report.graphs],
         "my_features": [_feature_to_dict(f) for f in report.my_features],  # ← Add here
     }
-    return json.dumps(data, indent=2)
+    return commentjson.dumps(data, indent=2)
 
 
 def _feature_to_dict(feature: MyExtractionResult) -> dict:
