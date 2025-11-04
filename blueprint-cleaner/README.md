@@ -9,6 +9,19 @@ Transform Unreal Engine 5 blueprint `.COPY` files into AI-friendly summaries for
 - **Graph insights**: Entry points, function calls, variable reads/writes, and developer comments
 - **Modular architecture**: Small, focused modules following clean code principles
 
+## Unreal Blueprint Glossary
+
+Unreal `.COPY` exports are plaintext snapshots of Blueprint assets. The parser builds its report by looking for the structural markers below. Keep these definitions handy while exploring the code (modules mentioned for reference).
+
+- **`Begin Object` … `End Object`** — Encapsulates a serialized object. Blocks can nest, so `parsers.block_extraction.collect_graph_blocks` tracks them with a stack until the matching `End Object` line.
+- **`Class=EdGraph` / `Schema=...`** — Identifies a graph definition. Kismet graphs use `EdGraph` classes, while UMG widgets expose schemas such as `WidgetGraphSchema`. Graph blocks are promoted to `GraphBlock` models only when both a schema and `Nodes(` marker are present.
+- **`Name="GraphName"`** — The human-friendly graph name. We surface it as `report.graphs[].name` and reuse it in Markdown/JSON formatters.
+- **`Nodes(`/`Begin Object Class=/Name=` inside a graph** — Describes individual node instances. Node parsing lives in `parsers.node_parsing` and turns each nested `Begin Object` into a `NodeBlock` with call/variable/comment data.
+- **`K2Node_*` identifiers** — Blueprint runtime nodes. The cleaner filters `K2Node_` prefixes when summarising execution flow. Comment nodes appear as `EdGraphNode_Comment` and become human-readable annotations in the output.
+- **UMG widget markers** — Widget Blueprints reuse the same block syntax but add keys such as `WidgetTree=`, `Animations=`, and `Bindings=`, which we extract via `widget_data.py` to populate dedicated sections in the report.
+
+Armed with these terms, you can follow the parsing pipeline from raw text (`pipeline.generate_blueprint_artifacts`) through to rendered summaries.
+
 ## Quick Start
 
 ```bash
