@@ -1,0 +1,50 @@
+Begin Object Class=/Script/UMGEditor.WidgetBlueprint Name="WBP_SimpleUI" ExportPath="/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_SimpleUI.WBP_SimpleUI'"
+   Begin Object Class=/Script/UMG.WidgetTree Name="WidgetTree" Archetype="/Script/UMG.WidgetTree'/Script/UMGEditor.Default__WidgetBlueprint:WidgetTree'"
+      Begin Object Class=/Script/UMG.Canvas Name="Canvas_0"
+         Slot=(Size=(SizeX=1920.0,SizeY=1080.0),Anchors=(Minimum=(X=0.0,Y=0.0),Maximum=(X=1.0,Y=1.0)))
+      End Object
+      Begin Object Class=/Script/UMG.Button Name="Button_Start"
+         Slot=(Size=(SizeX=200.0,SizeY=100.0))
+         ColorAndOpacity=(R=1.0,G=1.0,B=1.0,A=1.0)
+      End Object
+      Begin Object Class=/Script/UMG.TextBlock Name="Text_Title"
+         Text="Game Start"
+         Font=(Size=32)
+      End Object
+      Begin Object Class=/Script/UMG.Image Name="Image_Background"
+         Brush=(Tiling=Stretch,ResourceName="/Game/UI/BG_MainMenu")
+      End Object
+   End Object
+   
+   WidgetVariableNameToGuidMap=(
+      ("Button_Start",F95A1B2C3D4E5F6A7B8C9D0E1F2A3B4C),
+      ("Text_Title",A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D),
+      ("Image_Background",B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E)
+   )
+   
+   Bindings=(
+      (ObjectName="Button_Start",PropertyName="IsEnabled",FunctionName="IsGameReady"),
+      (ObjectName="Text_Title",PropertyName="ColorAndOpacity",FunctionName="GetTitleColor")
+   )
+   
+   Animations(0)="Anim_FadeIn"
+   Animations(1)="Anim_ButtonHover"
+   
+   Begin Object Class=/Script/Engine.EdGraph Name="EventGraph"
+      Schema=Class"/Script/UnrealEd.EdGraphSchema_K2"
+      Nodes(0)=(Class=/Script/BlueprintGraph.K2Node_Event,Name="K2Node_Event_0",NodeGuid=C91F8A2B3C4D5E6F7G8H9I0J1K2L3M4N)
+      Nodes(1)=(Class=/Script/BlueprintGraph.K2Node_CallFunction,Name="K2Node_CallFunction_0",NodeGuid=D02G9B3C4D5E6F7G8H9I0J1K2L3M4N5O)
+      Begin Object Class=/Script/BlueprintGraph.K2Node_Event Name="K2Node_Event_0"
+         EventReference=(MemberParent=Class"/Script/UMG.UserWidget",MemberName="Construct")
+         NodeComment="UI widget initialized"
+         NodePosX=50
+         NodePosY=50
+      End Object
+      Begin Object Class=/Script/BlueprintGraph.K2Node_CallFunction Name="K2Node_CallFunction_0"
+         FunctionReference=(MemberParent=WBP_SimpleUI,MemberName="PlayAnimation",MemberGuid=E13H0C4D5E6F7G8H9I0J1K2L3M4N5O6P)
+         NodeComment="Start fade-in animation"
+         NodePosX=250
+         NodePosY=50
+      End Object
+   End Object
+End Object

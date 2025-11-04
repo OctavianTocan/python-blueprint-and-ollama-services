@@ -1,0 +1,9 @@
+## Blueprint Summary
+
+**Purpose**: Melee combat component for hit detection, damage application, and physics impulse in third-person character combat
+
+**Key Functions**:
+- `EventGraph` - Main melee execution flow with damage, visual effects, and server replication
+- `CGraph Act` - Character viewpoint-based trace endpoint calculation for accurate hit detection
+- `CGraph Add Impulse` - Physics impulse application to hit targets
+- Event handlers: Act, All Apply,

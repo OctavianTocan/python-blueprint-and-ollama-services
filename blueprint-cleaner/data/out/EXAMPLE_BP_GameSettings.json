@@ -1,0 +1,101 @@
+{
+  "name": "BP_GameSettings",
+  "parent_class": null,
+  "cpp_class": "UBP_GameSettings",
+  "variables": [],
+  "graphs": [
+    {
+      "name": "BP_GameSettings",
+      "category": "Function Graph",
+      "entry_points": [
+        "BP_GameSettings"
+      ],
+      "calls": [
+        "Object::GetClass"
+      ],
+      "reads": [
+        "DifficultyLevel"
+      ],
+      "writes": [],
+      "comments": [
+        "Entry point",
+        "Get settings class",
+        "Load difficulty setting and return"
+      ],
+      "node_types": {
+        "FunctionEntry": 1,
+        "CallFunction": 1,
+        "VariableGet": 1,
+        "FunctionResult": 1,
+        "Comment": 1
+      }
+    },
+    {
+      "name": "EventGraph",
+      "category": "Event Graph",
+      "entry_points": [
+        "EventGraph"
+      ],
+      "calls": [
+        "Object::GetClass"
+      ],
+      "reads": [
+        "DifficultyLevel"
+      ],
+      "writes": [],
+      "comments": [
+        "Entry point",
+        "Get settings class",
+        "Load difficulty setting and return"
+      ],
+      "node_types": {
+        "FunctionEntry": 1,
+        "CallFunction": 1,
+        "VariableGet": 1,
+        "FunctionResult": 1,
+        "Comment": 1
+      }
+    }
+  ],
+  "functions": [
+    {
+      "name": "BP_GameSettings",
+      "display_name": "BP_GameSettings",
+      "category": "Function Graph",
+      "entry_points": [
+        "BP_GameSettings"
+      ],
+      "calls": [
+        "Object::GetClass"
+      ],
+      "reads": [
+        "DifficultyLevel"
+      ],
+      "writes": [],
+      "description": "Entry points: `BP_GameSettings`. Invokes `Object::GetClass`. Reads `DifficultyLevel`. Notes: Entry point.",
+      "access": "Public",
+      "is_event": false
+    },
+    {
+      "name": "EventGraph",
+      "display_name": "EventGraph",
+      "category": "Event Graph",
+      "entry_points": [
+        "EventGraph"
+      ],
+      "calls": [
+        "Object::GetClass"
+      ],
+      "reads": [
+        "DifficultyLevel"
+      ],
+      "writes": [],
+      "description": "Entry points: `EventGraph`. Invokes `Object::GetClass`. Reads `DifficultyLevel`. Notes: Entry point.",
+      "access": "Public",
+      "is_event": true
+    }
+  ],
+  "widget_bindings": [],
+  "widget_animations": [],
+  "widget_variables": []
+}
