@@ -25,6 +25,7 @@ def generate_blueprint_artifacts(
     summariser: Optional[SummaryFn] = None,
     summary_chunk_size: int = 4000,
     debug: bool = False,
+    format_type: str = "markdown",
 ) -> BlueprintArtifacts:
     """Produce all derived outputs for a blueprint."""
 
@@ -33,11 +34,15 @@ def generate_blueprint_artifacts(
     json_text = render_json_output(report)
 
     cpp = generate_unreal_cpp(report)
-    summary = generate_rolling_summary(
-        markdown,
-        summariser or _default_summariser(),
-        chunk_size=summary_chunk_size,
-    )
+    
+    # Only generate AI summary if the format requires it
+    summary = ""
+    if format_type.lower() in ["summary", "bundle"]:
+        summary = generate_rolling_summary(
+            markdown,
+            summariser or _default_summariser(),
+            chunk_size=summary_chunk_size,
+        )
 
     return BlueprintArtifacts(
         report=report,
@@ -61,11 +66,16 @@ def write_artifact_bundle(
 ) -> None:
     """Generate artifacts and write bundle to disk."""
 
+    # Bundle format requires AI summary
+    if summariser is None:
+        summariser = _default_summariser()
+    
     artifacts = generate_blueprint_artifacts(
         content,
         summariser=summariser,
         summary_chunk_size=summary_chunk_size,
         debug=debug,
+        format_type="bundle",
     )
     bundle_text = json.dumps(artifacts.to_bundle(), indent=2)
     write_text_file(output_path, bundle_text)
@@ -106,11 +116,18 @@ def clean_blueprint_file(
 
     try:
         content = read_text_file(input_file)
+        
+        # Only provide summariser if the format requires AI summary
+        summariser_to_use = summariser
+        if format_type.lower() in ["summary", "bundle"] and summariser is None:
+            summariser_to_use = _default_summariser()
+        
         artifacts = generate_blueprint_artifacts(
             content,
-            summariser=summariser or _default_summariser(),
+            summariser=summariser_to_use,
             summary_chunk_size=chunk_size,
             debug=debug,
+            format_type=format_type,
         )
 
         output_text = render_output(artifacts, format_type)

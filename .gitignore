@@ -232,9 +232,7 @@ __marimo__/
 .streamlit/secrets.toml
 *data/
 # Exceptions: include example files and documentation
-!blueprint-cleaner/data/
-!blueprint-cleaner/data/in/README.md
-!blueprint-cleaner/data/in/EXAMPLE_*.COPY
 !blueprint-cleaner/data/docs/
 .fleet/
 .vs/
+
