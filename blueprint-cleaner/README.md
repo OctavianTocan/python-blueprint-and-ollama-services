@@ -13,6 +13,15 @@ Transform Unreal Engine 5 blueprint `.COPY` files into AI-friendly summaries for
 
 When you export a Blueprint from Unreal Engine, you get a `.COPY` file—a text snapshot of your Blueprint's structure. Here's what the parser looks for:
 
+### How to Export a .COPY File
+
+1. In **Unreal Engine 5**, open the **Content Browser**
+2. **Right-click** on your Blueprint asset
+3. Select **Asset Actions** → **Export**
+4. Choose a filename (e.g., `MyBlueprint.COPY`) and save
+
+The resulting `.COPY` file is a text-based export that can be opened in any text editor. **Note:** `.COPY` files cannot be directly re-imported into UE5. To move Blueprints between projects, use the **Migrate** feature or copy `.uasset` files directly.
+
 ### Basic Building Blocks
 
 **`Begin Object` … `End Object`**  
@@ -54,6 +63,12 @@ Graph extraction → `parsers/block_extraction.py`
 Node parsing → `parsers/node_parsing.py`  
 Widget data → `widget_data.py`  
 Final report → `pipeline.py`
+
+**Deep dives:**
+
+- [Architecture & Design Decisions](./docs/ARCHITECTURE.md) — Why the parser uses pure functions instead of inheritance
+- [Parser Pattern Guide](./docs/PARSER_PATTERN.md) — How to add new parsers
+- [Debugging Patterns](./docs/DEBUGGING.md) — Troubleshooting common issues
 
 ## Quick Start
 
@@ -98,6 +113,8 @@ blueprint-cleaner/
 
 ## Architecture
 
+For a deep dive on design philosophy, see [Architecture & Design Decisions](./docs/ARCHITECTURE.md).
+
 ### Parsers
 
 Small, focused modules for extracting data from blueprint text:
@@ -124,6 +141,18 @@ Orchestrates the full workflow:
 3. Build structured report
 4. Render in requested format
 5. Write output file
+
+## Debugging & Troubleshooting
+
+**Graphs not detected?** Check that `Schema=` and `Nodes(` are both present in the `.COPY` file. See [Debugging Patterns](./docs/DEBUGGING.md) for detailed checks.
+
+**Widget data missing?** Verify your file is a WidgetBlueprint with `WidgetTree=`, `Bindings=`, or `Animations=` sections. Use debug mode:
+
+```bash
+blueprint-cleaner your_file.COPY -d
+```
+
+For more troubleshooting, see [Debugging Patterns](./docs/DEBUGGING.md).
 
 ## Dependencies
 

@@ -145,3 +145,15 @@ Format mapping in `cli.py`; extension logic in `pipeline.render_output`.
   - Wire into report.build_blueprint_report
   - Emit in formatters (markdown.py, json_output.py)
   - Add test fixture in test_blueprint_cleaner.py
+  - See blueprint-cleaner/docs/PARSER_PATTERN.md for complete walkthrough
+
+## Parser Architecture Philosophy
+
+Parsers are **pure functions**, not classes. See `blueprint-cleaner/docs/ARCHITECTURE.md` for why:
+
+- Each parser: text → typed dataclass (no inheritance)
+- Orchestrated in `report.py`, not via polymorphism
+- Enables independent evolution and testing
+- Avoids abstraction tax of inheritance when interfaces differ
+
+Example: `extract_widget_bindings(content) → List[WidgetBinding]` with no base class contract.
