@@ -236,3 +236,5 @@ __marimo__/
 !blueprint-cleaner/data/in/README.md
 !blueprint-cleaner/data/in/EXAMPLE_*.COPY
 !blueprint-cleaner/data/docs/
+.fleet/
+.vs/
