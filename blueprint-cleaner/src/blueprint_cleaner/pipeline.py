@@ -34,7 +34,7 @@ def generate_blueprint_artifacts(
     json_text = render_json_output(report)
 
     cpp = generate_unreal_cpp(report)
-    
+
     # Only generate AI summary if the format requires it
     summary = ""
     if format_type.lower() in ["summary", "bundle"]:
@@ -69,7 +69,7 @@ def write_artifact_bundle(
     # Bundle format requires AI summary
     if summariser is None:
         summariser = _default_summariser()
-    
+
     artifacts = generate_blueprint_artifacts(
         content,
         summariser=summariser,
@@ -116,12 +116,12 @@ def clean_blueprint_file(
 
     try:
         content = read_text_file(input_file)
-        
+
         # Only provide summariser if the format requires AI summary
         summariser_to_use = summariser
         if format_type.lower() in ["summary", "bundle"] and summariser is None:
             summariser_to_use = _default_summariser()
-        
+
         artifacts = generate_blueprint_artifacts(
             content,
             summariser=summariser_to_use,
