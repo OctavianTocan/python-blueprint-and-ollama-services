@@ -42,6 +42,23 @@ Begin Object Name="EventGraph"
 End Object
 """.strip()
 
+WIDGET_BLUEPRINT_SAMPLE = """
+Begin Object Class=/Script/UMG.WidgetBlueprintGeneratedClass Name="WBP_Test"
+End Object
+
+Bindings(0)=(ObjectName="TextBlock_1",PropertyName="Text",FunctionName="GetText_0")
+WidgetVariableNameToGuidMap=(("TextBlock_1", ABCDEF1234567890ABCDEF1234567890),("CanvasPanel_0", FEDCBA0987654321FEDCBA0987654321))
+Animations(0)="/Script/UMG.WidgetAnimation'WBP_Test:Fade'"
+
+Begin Object Class=/Script/Engine.EdGraph Name="EventGraph"
+    Schema="/Script/CoreUObject.Class'/Script/UMGEditor.WidgetGraphSchema'"
+    Nodes(0)="/Script/BlueprintGraph.K2Node_CustomEvent'K2Node_CustomEvent_0'"
+    Begin Object Class=/Script/BlueprintGraph.K2Node_CustomEvent Name="K2Node_CustomEvent_0"
+        CustomFunctionName="Event Test"
+    End Object
+End Object
+""".strip()
+
 
 def make_stub_summariser():
     """Create a deterministic stub summariser for batch aggregation tests."""
@@ -94,6 +111,36 @@ def test_generate_artifacts_exposes_all_required_outputs():
     assert "void ABP_Test::" in artifacts.cpp_source
     assert artifacts.cpp_header_path == "Source/Game/BP_Test.h"
     assert artifacts.cpp_source_path == "Source/Game/BP_Test.cpp"
+
+
+def test_widget_blueprint_reports_umg_metadata():
+    """Widget blueprints should expose bindings, animations, and widget variables."""
+
+    from blueprint_cleaner.pipeline import generate_blueprint_artifacts
+
+    summariser, _ = make_stub_summariser()
+    artifacts = generate_blueprint_artifacts(
+        WIDGET_BLUEPRINT_SAMPLE,
+        summariser=summariser,
+        summary_chunk_size=120,
+    )
+
+    report = artifacts.report
+    assert report.widget_bindings, "Expected widget bindings to be parsed"
+    assert report.widget_bindings[0].widget_name == "TextBlock_1"
+    assert report.widget_animations == ["Fade"]
+    assert any(item.name == "CanvasPanel_0" for item in report.widget_variables)
+    assert report.graphs, "Widget graph schema should still be parsed"
+
+    markdown = artifacts.markdown
+    assert "## UMG Bindings" in markdown
+    assert "## UMG Animations" in markdown
+    assert "## Widget Variables" in markdown
+
+    payload = json.loads(artifacts.json_text)
+    assert payload["widget_bindings"]
+    assert payload["widget_animations"]
+    assert payload["widget_variables"]
 
 
 def test_generate_bundled_output_returns_json_bundle(tmp_path):
