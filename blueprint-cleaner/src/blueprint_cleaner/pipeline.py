@@ -115,6 +115,7 @@ def clean_blueprint_file(
     print_processing_header(input_file, output_file, format_type)
 
     try:
+        # Load blueprint content
         content = read_text_file(input_file)
 
         # Only provide summariser if the format requires AI summary

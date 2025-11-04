@@ -5,7 +5,7 @@ Provides functions to convert structured blueprint data into JSON format.
 
 from __future__ import annotations
 
-import json
+import commentjson
 
 from ..models import (
     BlueprintReport,
@@ -23,7 +23,7 @@ def render_json_output(report: BlueprintReport) -> str:
     @param report: Structured blueprint data.
     @return: JSON string with indentation.
     """
-    return json.dumps(report_to_dict(report), indent=2)
+    return commentjson.dumps(report_to_dict(report), indent=2)
 
 
 def report_to_dict(report: BlueprintReport) -> dict:

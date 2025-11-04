@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import json
+import commentjson
 from dataclasses import dataclass, field
 from typing import Dict
 
@@ -69,7 +69,7 @@ class BlueprintArtifacts:
         """
 
         # Parse the JSON text to create a mutable payload
-        payload = json.loads(self.json_text)
+        payload = commentjson.loads(self.json_text)
         
 
         # Ensure functions are included in the payload, adding them if not present
