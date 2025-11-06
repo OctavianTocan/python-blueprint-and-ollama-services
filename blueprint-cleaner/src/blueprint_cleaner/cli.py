@@ -17,6 +17,28 @@ SUPPORTED_FORMATS = [
     "cpp-source",
 ]
 
+EXTENSION_MAP = {
+    "markdown": ".md",
+    "json": ".json",
+    "bundle": ".bundle.json",
+    "summary": ".summary.txt",
+    "cpp-header": ".h",
+    "cpp-source": ".cpp",
+}
+
+
+def get_extension_for_format(format_name: str) -> str:
+    """Return the file extension for the given format."""
+    return EXTENSION_MAP.get(format_name, ".md")
+
+
+def ensure_correct_extension(output_path: str, format_name: str) -> str:
+    """Append the correct extension to output_path if it doesn't have one."""
+    expected_extension = get_extension_for_format(format_name)
+    if not output_path.endswith(expected_extension):
+        return output_path + expected_extension
+    return output_path
+
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the argument parser for the CLI."""
@@ -61,21 +83,15 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     output_path = args.output
+    format_choice = "markdown" if args.format == "text" else args.format
+
     if not output_path:
         base_name = os.path.splitext(args.input)[0]
-        format_choice = args.format if args.format != "text" else "markdown"
-        extension_map = {
-            "markdown": ".md",
-            "json": ".json",
-            "bundle": ".bundle.json",
-            "summary": ".summary.txt",
-            "cpp-header": ".h",
-            "cpp-source": ".cpp",
-        }
-        extension = extension_map.get(format_choice, ".md")
+        extension = get_extension_for_format(format_choice)
         output_path = f"{base_name}_cleaned{extension}"
+    else:
+        output_path = ensure_correct_extension(output_path, format_choice)
 
-    format_choice = "markdown" if args.format == "text" else args.format
     success = clean_blueprint_file(
         args.input,
         output_path,
