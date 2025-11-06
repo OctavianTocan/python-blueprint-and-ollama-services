@@ -1,0 +1,60 @@
+Begin Object Class=/Script/Engine.Blueprint Name="BP_SimpleCharacter"
+   ParentClass=/Script/Engine.Character
+   CppClassName="ASimpleCharacter"
+   RootComponentName="CapsuleComponent"
+   
+   Begin Object Class=/Script/Engine.EdGraph Name="EventGraph"
+      Schema=Class"/Script/UnrealEd.EdGraphSchema_K2"
+      Nodes(0)=(Class=/Script/BlueprintGraph.K2Node_Event,Name="K2Node_Event_0",NodeGuid=D37C4F3F4C24B3129CE65A9D3D2E1A5F)
+      Nodes(1)=(Class=/Script/BlueprintGraph.K2Node_CallFunction,Name="K2Node_CallFunction_0",NodeGuid=E48D5E4F5D35C4239DF76BAE4E3F2B6F)
+      Nodes(2)=(Class=/Script/BlueprintGraph.K2Node_VariableSet,Name="K2Node_VariableSet_0",NodeGuid=F59E6F5F6E46D5349EF87CBF5F4G3C7F)
+      Nodes(3)=(Class=/Script/UnrealEd.EdGraphNode_Comment,Name="EdGraphNode_Comment_0",NodeGuid=A60F7G6G7F57E6459FF98DCG6F5H4D8F)
+      Begin Object Class=/Script/BlueprintGraph.K2Node_Event Name="K2Node_Event_0"
+         EventReference=(MemberParent=Class"/Script/Engine.Pawn",MemberName="BeginPlay")
+         NodeComment="Game starts - initialize"
+         NodePosX=100
+         NodePosY=50
+      End Object
+      Begin Object Class=/Script/BlueprintGraph.K2Node_CallFunction Name="K2Node_CallFunction_0"
+         FunctionReference=(MemberParent=Class"/Script/Engine.Character",MemberName="Jump")
+         NodeComment="Make character jump"
+         NodePosX=300
+         NodePosY=50
+      End Object
+      Begin Object Class=/Script/BlueprintGraph.K2Node_VariableSet Name="K2Node_VariableSet_0"
+         VariableReference=(MemberParent=BP_SimpleCharacter,MemberName="Health",MemberGuid=123ABC456DEF789)
+         NodePosX=500
+         NodePosY=50
+      End Object
+      Begin Object Class=/Script/UnrealEd.EdGraphNode_Comment Name="EdGraphNode_Comment_0"
+         NodeComment="Character initialization sequence"
+         Size=(SizeX=400.0,SizeY=100.0)
+         NodePosX=50
+         NodePosY=0
+      End Object
+   End Object
+   
+   Begin Object Class=/Script/Engine.EdGraph Name="DeathEvent"
+      Schema=Class"/Script/UnrealEd.EdGraphSchema_K2"
+      Nodes(0)=(Class=/Script/BlueprintGraph.K2Node_CustomEvent,Name="K2Node_CustomEvent_0",NodeGuid=B71G8H7H8G68F7569GG09EDH7G6I5E9F)
+      Nodes(1)=(Class=/Script/BlueprintGraph.K2Node_CallFunction,Name="K2Node_CallFunction_1",NodeGuid=C82H9I8I9H79G8679HH10FEI8H7J6F0G)
+      Begin Object Class=/Script/BlueprintGraph.K2Node_CustomEvent Name="K2Node_CustomEvent_0"
+         CustomFunctionName="OnDeath"
+         NodeComment="Custom event fired when character dies"
+         NodePosX=100
+         NodePosY=100
+      End Object
+      Begin Object Class=/Script/BlueprintGraph.K2Node_CallFunction Name="K2Node_CallFunction_1"
+         FunctionReference=(MemberParent=Class"/Script/Engine.Actor",MemberName="Destroy")
+         NodeComment="Remove character from world"
+         NodePosX=300
+         NodePosY=100
+      End Object
+   End Object
+   
+   VariableData=(
+      (Name="Health",Value=100.0,Category="Gameplay",VarType=FloatProperty),
+      (Name="MaxHealth",Value=100.0,Category="Gameplay",VarType=FloatProperty),
+      (Name="IsAlive",Value=true,Category="State",VarType=BoolProperty)
+   )
+End Object

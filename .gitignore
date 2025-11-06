@@ -12,6 +12,8 @@ references/
 *$py.class
 
 *.COPY
+# Exception: include example .COPY files for documentation
+!blueprint-cleaner/data/in/EXAMPLE_*.COPY
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -229,3 +231,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 *data/
+# Exceptions: include example files and documentation
+!blueprint-cleaner/data/docs/
+.fleet/
+.vs/
+

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import json
+import commentjson
 
 from .artifacts import BlueprintArtifacts
 
@@ -14,7 +14,7 @@ def render_output(artifacts: BlueprintArtifacts, format_type: str) -> str:
     if fmt == "json":
         return artifacts.json_text
     if fmt == "bundle":
-        return json.dumps(artifacts.to_bundle(), indent=2)
+        return commentjson.dumps(artifacts.to_bundle(), indent=2)
     if fmt == "summary":
         return artifacts.ai_summary
     if fmt == "cpp-header":

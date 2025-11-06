@@ -5,9 +5,16 @@ Provides functions to convert structured blueprint data into JSON format.
 
 from __future__ import annotations
 
-import json
+import commentjson
 
-from ..models import BlueprintReport, FunctionSynopsis, GraphSummary, VariableInfo
+from ..models import (
+    BlueprintReport,
+    FunctionSynopsis,
+    GraphSummary,
+    VariableInfo,
+    WidgetBinding,
+    WidgetVariable,
+)
 
 
 def render_json_output(report: BlueprintReport) -> str:
@@ -16,7 +23,7 @@ def render_json_output(report: BlueprintReport) -> str:
     @param report: Structured blueprint data.
     @return: JSON string with indentation.
     """
-    return json.dumps(report_to_dict(report), indent=2)
+    return commentjson.dumps(report_to_dict(report), indent=2)
 
 
 def report_to_dict(report: BlueprintReport) -> dict:
@@ -32,6 +39,13 @@ def report_to_dict(report: BlueprintReport) -> dict:
         "variables": [variable_to_dict(variable) for variable in report.variables],
         "graphs": [graph_to_dict(graph) for graph in report.graphs],
         "functions": [function_to_dict(fn) for fn in report.functions],
+        "widget_bindings": [
+            binding_to_dict(binding) for binding in report.widget_bindings
+        ],
+        "widget_animations": report.widget_animations,
+        "widget_variables": [
+            widget_variable_to_dict(item) for item in report.widget_variables
+        ],
     }
 
 
@@ -82,4 +96,23 @@ def function_to_dict(function: FunctionSynopsis) -> dict:
         "description": function.description,
         "access": function.access,
         "is_event": function.is_event,
+    }
+
+
+def binding_to_dict(binding: WidgetBinding) -> dict:
+    """Serialize widget binding to dictionary."""
+
+    return {
+        "widget": binding.widget_name,
+        "property": binding.property_name,
+        "function": binding.function_name,
+    }
+
+
+def widget_variable_to_dict(variable: WidgetVariable) -> dict:
+    """Serialize widget variable to dictionary."""
+
+    return {
+        "name": variable.name,
+        "guid": variable.guid,
     }

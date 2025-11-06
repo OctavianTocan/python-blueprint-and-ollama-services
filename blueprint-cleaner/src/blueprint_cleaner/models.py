@@ -36,6 +36,23 @@ class GraphBlock:
 
 
 @dataclass
+class WidgetBinding:
+    """Binding between a widget property and a blueprint function."""
+
+    widget_name: str
+    property_name: str
+    function_name: str
+
+
+@dataclass
+class WidgetVariable:
+    """Widget component exposed as a variable on the blueprint."""
+
+    name: str
+    guid: Optional[str] = None
+
+
+@dataclass
 class NodeBlock:
     """Raw node block inside a graph."""
 
@@ -82,3 +99,6 @@ class BlueprintReport:
     variables: List[VariableInfo]
     graphs: List[GraphSummary]
     functions: List[FunctionSynopsis] = field(default_factory=list)
+    widget_bindings: List[WidgetBinding] = field(default_factory=list)
+    widget_animations: List[str] = field(default_factory=list)
+    widget_variables: List[WidgetVariable] = field(default_factory=list)

@@ -5,9 +5,70 @@ Transform Unreal Engine 5 blueprint `.COPY` files into AI-friendly summaries for
 ## Features
 
 - **Clean extraction**: Parses variables, graphs, function calls, and metadata from blueprint exports
-- **Multiple formats**: Output as Markdown or JSON
+- **Multiple formats**: Output as Markdown or JSONC (JSON with Comments)
 - **Graph insights**: Entry points, function calls, variable reads/writes, and developer comments
 - **Modular architecture**: Small, focused modules following clean code principles
+
+## Understanding Blueprint `.COPY` Files
+
+When you export a Blueprint from Unreal Engine, you get a `.COPY` file—a text snapshot of your Blueprint's structure. Here's what the parser looks for:
+
+### How to Export a .COPY File
+
+1. In **Unreal Engine 5**, open the **Content Browser**
+2. **Right-click** on your Blueprint asset
+3. Select **Asset Actions** → **Export**
+4. Choose a filename (e.g., `MyBlueprint.COPY`) and save
+
+The resulting `.COPY` file is a text-based export that can be opened in any text editor. **Note:** `.COPY` files cannot be directly re-imported into UE5. To move Blueprints between projects, use the **Migrate** feature or copy `.uasset` files directly.
+
+### Basic Building Blocks
+
+**`Begin Object` … `End Object`**  
+Think of these as containers. Everything in a Blueprint—graphs, nodes, variables—lives inside these paired tags. They can nest like folders within folders.
+
+**`Name="SomeName"`**  
+The friendly name you see in the Unreal editor. The parser extracts this to label graphs and nodes in the output.
+
+### Graphs (Visual Script Diagrams)
+
+**`Class=EdGraph`** or **`Schema=...`**  
+Marks the start of a graph definition. Regular Blueprints use `EdGraph`, while UI widgets use `WidgetGraphSchema`. The parser only treats a block as a graph if it finds both a schema marker and a `Nodes(` array.
+
+**`Nodes(`**  
+Lists all the visual nodes in that graph. Each node is another nested `Begin Object` block.
+
+### Nodes (Individual Action Boxes)
+
+**`K2Node_*`**  
+Blueprint execution nodes (like "Branch", "Set Variable", "Call Function"). The parser reads these to find what your Blueprint actually does.
+
+**`EdGraphNode_Comment`**  
+Developer notes you added in the graph. These show up as readable annotations in the summary.
+
+### UI Blueprints (Widgets)
+
+Widget Blueprints add extra sections:
+
+- **`WidgetTree=`** — The hierarchy of UI elements (buttons, text boxes, etc.)
+- **`Animations=`** — Timeline animations for your UI
+- **`Bindings=`** — Connections between UI elements and Blueprint logic
+
+The parser extracts these separately so your UI structure is easy to review.
+
+---
+
+**Where to look in the code:**  
+Graph extraction → `parsers/block_extraction.py`  
+Node parsing → `parsers/node_parsing.py`  
+Widget data → `widget_data.py`  
+Final report → `pipeline.py`
+
+**Deep dives:**
+
+- [Architecture & Design Decisions](./docs/ARCHITECTURE.md) — Why the parser uses pure functions instead of inheritance
+- [Parser Pattern Guide](./docs/PARSER_PATTERN.md) — How to add new parsers
+- [Debugging Patterns](./docs/DEBUGGING.md) — Troubleshooting common issues
 
 ## Quick Start
 
@@ -22,7 +83,7 @@ uv run blueprint-cleaner data/in/MyBlueprint.COPY
 # Custom output
 uv run blueprint-cleaner data/in/MyBlueprint.COPY -o data/out/summary.md
 
-# JSON format
+# JSONC format (JSON with Comments)
 uv run blueprint-cleaner data/in/MyBlueprint.COPY --format json
 
 # Debug mode
@@ -52,6 +113,8 @@ blueprint-cleaner/
 
 ## Architecture
 
+For a deep dive on design philosophy, see [Architecture & Design Decisions](./docs/ARCHITECTURE.md).
+
 ### Parsers
 
 Small, focused modules for extracting data from blueprint text:
@@ -78,6 +141,18 @@ Orchestrates the full workflow:
 3. Build structured report
 4. Render in requested format
 5. Write output file
+
+## Debugging & Troubleshooting
+
+**Graphs not detected?** Check that `Schema=` and `Nodes(` are both present in the `.COPY` file. See [Debugging Patterns](./docs/DEBUGGING.md) for detailed checks.
+
+**Widget data missing?** Verify your file is a WidgetBlueprint with `WidgetTree=`, `Bindings=`, or `Animations=` sections. Use debug mode:
+
+```bash
+blueprint-cleaner your_file.COPY -d
+```
+
+For more troubleshooting, see [Debugging Patterns](./docs/DEBUGGING.md).
 
 ## Dependencies
 
@@ -133,9 +208,9 @@ _Parent Class:_ `IG_PlayerCharacter`
 ...
 ```
 
-### JSON
+### JSONC (JSON with Comments)
 
-```json
+```jsonc
 {
   "name": "BPAC_IG_PCH_Melee",
   "parent_class": "IG_PlayerCharacter",

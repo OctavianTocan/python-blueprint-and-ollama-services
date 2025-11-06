@@ -8,7 +8,14 @@ from __future__ import annotations
 
 from typing import List, Sequence
 
-from ..models import BlueprintReport, FunctionSynopsis, GraphSummary, VariableInfo
+from ..models import (
+    BlueprintReport,
+    FunctionSynopsis,
+    GraphSummary,
+    VariableInfo,
+    WidgetBinding,
+    WidgetVariable,
+)
 
 
 def format_as_markdown(report: BlueprintReport) -> str:
@@ -20,6 +27,9 @@ def format_as_markdown(report: BlueprintReport) -> str:
     sections = [
         render_summary_section(report),
         render_variable_section(report.variables),
+        render_widget_variable_section(report.widget_variables),
+        render_widget_bindings_section(report.widget_bindings),
+        render_widget_animation_section(report.widget_animations),
         render_function_section(report.functions),
         render_graph_section(report.graphs),
     ]
@@ -84,6 +94,54 @@ def render_variable_section(variables: Sequence[VariableInfo]) -> str:
     ]
     for variable in variables:
         lines.append(build_variable_row(variable))
+
+    return "\n".join(lines)
+
+
+def render_widget_variable_section(variables: Sequence[WidgetVariable]) -> str:
+    """Render widget component variables as markdown table."""
+
+    if not variables:
+        return ""
+
+    lines = [
+        "## Widget Variables",
+        "| Name | GUID |",
+        "| --- | --- |",
+    ]
+
+    for variable in variables:
+        guid = variable.guid or "—"
+        lines.append(f"| `{variable.name}` | {guid} |")
+
+    return "\n".join(lines)
+
+
+def render_widget_bindings_section(bindings: Sequence[WidgetBinding]) -> str:
+    """Render widget bindings as bullet list."""
+
+    if not bindings:
+        return ""
+
+    lines: List[str] = ["## UMG Bindings"]
+
+    for binding in bindings:
+        lines.append(
+            f"- `{binding.widget_name}` → `{binding.property_name}` via `{binding.function_name}`"
+        )
+
+    return "\n".join(lines)
+
+
+def render_widget_animation_section(animations: Sequence[str]) -> str:
+    """Render widget animation names."""
+
+    if not animations:
+        return ""
+
+    lines: List[str] = ["## UMG Animations"]
+    for name in animations:
+        lines.append(f"- `{name}`")
 
     return "\n".join(lines)
 

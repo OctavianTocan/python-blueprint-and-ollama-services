@@ -33,19 +33,49 @@ Purpose: Make AI coding agents productive immediately in this workspace by captu
 
 ## Blueprint Cleaner architecture
 
-- Entry: blueprint_cleaner.cli: parses args and calls pipeline.clean_blueprint_file
-- Pipeline:
-  - build_blueprint_report(content) → dataclass BlueprintReport (see models.py)
-  - formatters:
-    - formatters/markdown.py → format_as_markdown(report)
-    - formatters/json_output.py → render_json_output(report)
-    - formatters/unreal_cpp.py → generate_unreal_cpp(report) producing header/source + paths
-  - summaries.generate_rolling_summary(markdown, summariser, chunk_size) → AI summary
-  - artifacts.BlueprintArtifacts aggregates outputs and bundles via to_bundle()
-- Supported formats (CLI -f): markdown, json, bundle, summary, cpp-header, cpp-source
-- Data flow in pipeline.clean_blueprint_file:
-  - read_text_file → generate_blueprint_artifacts → render_output → write_text_file
-  - console helpers from toolkit.console print processing header/summary/footer
+### Understanding .COPY Files
+
+Unreal `.COPY` exports are text snapshots with nested `Begin Object`/`End Object` blocks. Key patterns:
+
+- **Graph blocks**: Must have both `Schema=` (e.g., EdGraphSchema, WidgetGraphSchema) AND `Nodes(` array
+- **Node blocks**: Nested objects starting with `K2Node_*` (execution) or `EdGraphNode_Comment` (annotations)
+- **Widget blueprints**: Add `WidgetTree=`, `Animations=`, `Bindings=` sections parsed separately
+- Stack-based extraction: `parsers.block_extraction.collect_graph_blocks` tracks nesting with a stack until matching `End Object`
+
+### Data Flow
+
+1. **Entry**: `cli.py` → `pipeline.clean_blueprint_file`
+2. **Report building** (`report.build_blueprint_report`):
+   - `metadata.build_metadata` → name, parent class, cpp class
+   - `variables.extract_variables` → variable declarations
+   - `graphs.summarize_graphs` → `collect_graph_blocks` → `collect_node_blocks` → `node_parsing` extracts calls/vars/comments
+   - `widget_data` extracts bindings, animations, widget variables (UMG only)
+   - `analysis.build_function_synopses` deduplicates function calls across graphs
+3. **Formatting**:
+   - `formatters/markdown.py` → human-readable with tables and sections
+   - `formatters/json_output.py` → machine-readable JSON
+   - `formatters/unreal_cpp.py` → C++ header/source stubs
+4. **Artifacts**: `BlueprintArtifacts` bundles all outputs; `to_bundle()` produces JSON payload
+
+### Parser Layers (parsers/)
+
+- **block_extraction**: `collect_graph_blocks(lines)` finds EdGraph blocks; `collect_node_blocks(graph)` extracts nodes
+- **graph_classification**: Categorizes graphs (event, function, macro, construction script)
+- **node_parsing**: Reads `K2Node_*` for function calls, variable reads/writes, developer comments
+- **variable_collection**: `collect_variable_entries(content, anchor)` gathers variable metadata arrays
+- **variable_parsing**: Converts variable entries to `VariableInfo` models
+
+### Output Formats
+
+CLI `-f` flag (see `cli.SUPPORTED_FORMATS`):
+
+- `markdown` (default): Rich summary with tables
+- `json`: Structured JSON
+- `bundle`: JSON bundle with all formats embedded
+- `summary`: AI-generated rolling summary (calls Ollama via `summaries.generate_rolling_summary`)
+- `cpp-header`/`cpp-source`: C++ skeleton code
+
+Format mapping in `cli.py`; extension logic in `pipeline.render_output`.
 
 ## Ollama Service architecture
 
@@ -72,6 +102,10 @@ Purpose: Make AI coding agents productive immediately in this workspace by captu
   - summaries.generate_rolling_summary(windowed over markdown) calls a summariser callback
   - Default summariser in pipeline.\_default_summariser uses ollama_service.client.ask_ollama_question
   - Known pitfall: Ollama can return empty responses → client raises RuntimeError; tests stub summariser
+- Widget blueprint handling:
+  - UMG bindings stay in "UMG Bindings" section (widget → property → function)
+  - Animations listed by name only (strip path/metadata)
+  - Widget variables in separate section from blueprint variables
 
 ## Testing expectations
 
@@ -80,6 +114,7 @@ Purpose: Make AI coding agents productive immediately in this workspace by captu
   - uv run pytest blueprint-cleaner/tests/test_blueprint_cleaner.py -q
   - uv run pytest ollama-service/tests/test_ollama_service.py -q
 - Some tests describe desired future behavior (spec-first). Expect initial failures when features are not implemented yet.
+- Widget tests: `test_widget_blueprint_reports_umg_metadata` validates bindings/animations/widget vars extraction + graph parsing
 
 ## Examples to follow
 
@@ -87,6 +122,7 @@ Purpose: Make AI coding agents productive immediately in this workspace by captu
 - Rolling summary: blueprint_cleaner/summaries.py demonstrates chunking and prompt composition
 - HTTP client: ollama_service/client.py shows payload building, response parsing, and code‑block stripping
 - Bundle shape: blueprint_cleaner/artifacts.py → AVAILABLE_FORMATS and to_bundle() payload
+- Widget extraction: widget_data.py regex-based parsing for bindings/animations/widget vars
 
 ## Environment & config
 
@@ -103,3 +139,21 @@ Purpose: Make AI coding agents productive immediately in this workspace by captu
   - artifacts.AVAILABLE_FORMATS
   - pipeline.render_output branch
   - tests for bundles/outputs
+- When extending parsers:
+  - Add extraction logic in parsers/ or widget_data.py
+  - Update models.py with new dataclasses
+  - Wire into report.build_blueprint_report
+  - Emit in formatters (markdown.py, json_output.py)
+  - Add test fixture in test_blueprint_cleaner.py
+  - See blueprint-cleaner/docs/PARSER_PATTERN.md for complete walkthrough
+
+## Parser Architecture Philosophy
+
+Parsers are **pure functions**, not classes. See `blueprint-cleaner/docs/ARCHITECTURE.md` for why:
+
+- Each parser: text → typed dataclass (no inheritance)
+- Orchestrated in `report.py`, not via polymorphism
+- Enables independent evolution and testing
+- Avoids abstraction tax of inheritance when interfaces differ
+
+Example: `extract_widget_bindings(content) → List[WidgetBinding]` with no base class contract.

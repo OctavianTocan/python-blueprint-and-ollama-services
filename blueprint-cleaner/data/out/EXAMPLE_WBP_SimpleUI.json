@@ -1,0 +1,107 @@
+{
+  "name": "WBP_SimpleUI",
+  "parent_class": null,
+  "cpp_class": "UWBP_SimpleUI",
+  "variables": [],
+  "graphs": [
+    {
+      "name": "EventGraph",
+      "category": "Event Graph",
+      "entry_points": [
+        "EventGraph"
+      ],
+      "calls": [
+        "WBP_SimpleUI::PlayAnimation"
+      ],
+      "reads": [],
+      "writes": [],
+      "comments": [
+        "UI widget initialized",
+        "Start fade-in animation"
+      ],
+      "node_types": {
+        "Event": 1,
+        "CallFunction": 1
+      }
+    },
+    {
+      "name": "WBP_SimpleUI",
+      "category": "Utility Graph",
+      "entry_points": [
+        "WBP_SimpleUI"
+      ],
+      "calls": [
+        "WBP_SimpleUI::PlayAnimation"
+      ],
+      "reads": [],
+      "writes": [],
+      "comments": [
+        "UI widget initialized",
+        "Start fade-in animation"
+      ],
+      "node_types": {
+        "Event": 1,
+        "CallFunction": 1
+      }
+    }
+  ],
+  "functions": [
+    {
+      "name": "EventGraph",
+      "display_name": "EventGraph",
+      "category": "Event Graph",
+      "entry_points": [
+        "EventGraph"
+      ],
+      "calls": [
+        "WBP_SimpleUI::PlayAnimation"
+      ],
+      "reads": [],
+      "writes": [],
+      "description": "Entry points: `EventGraph`. Invokes `WBP_SimpleUI::PlayAnimation`. Notes: UI widget initialized.",
+      "access": "Public",
+      "is_event": true
+    },
+    {
+      "name": "WBP_SimpleUI",
+      "display_name": "WBP_SimpleUI",
+      "category": "Utility Graph",
+      "entry_points": [
+        "WBP_SimpleUI"
+      ],
+      "calls": [
+        "WBP_SimpleUI::PlayAnimation"
+      ],
+      "reads": [],
+      "writes": [],
+      "description": "Entry points: `WBP_SimpleUI`. Invokes `WBP_SimpleUI::PlayAnimation`. Notes: UI widget initialized.",
+      "access": "Public",
+      "is_event": false
+    }
+  ],
+  "widget_bindings": [
+    {
+      "widget": "Button_Start",
+      "property": "IsEnabled",
+      "function": "IsGameReady"
+    }
+  ],
+  "widget_animations": [
+    "Anim_ButtonHover",
+    "Anim_FadeIn"
+  ],
+  "widget_variables": [
+    {
+      "name": "Button_Start",
+      "guid": "F95A1B2C3D4E5F6A7B8C9D0E1F2A3B4C"
+    },
+    {
+      "name": "Image_Background",
+      "guid": "B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E"
+    },
+    {
+      "name": "Text_Title",
+      "guid": "A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D"
+    }
+  ]
+}

@@ -22,7 +22,7 @@ def collect_graph_blocks(lines: Sequence[str]) -> List[GraphBlock]:
 
     for index, line in enumerate(lines):
         stripped = line.strip()
-        if stripped.startswith("Begin Object Name="):
+        if stripped.startswith("Begin Object"):
             name = extract_name_from_begin_object(line)
             stack.append((index, name or ""))
         elif stripped == "End Object" and stack:
@@ -63,9 +63,21 @@ def is_graph_block(lines: Sequence[str]) -> bool:
     @param lines: Block content lines.
     @return: True if block contains schema and nodes markers.
     """
-    has_schema = any("Schema=Class" in line for line in lines)
+    has_schema = any(_line_has_graph_schema(line) for line in lines)
     has_nodes = any("Nodes(" in line for line in lines)
     return has_schema and has_nodes
+
+
+def _line_has_graph_schema(line: str) -> bool:
+    """Detect graph schema declarations supporting K2 and UMG widgets.
+
+    @param line: Blueprint line potentially containing schema metadata.
+    @return: True if the line denotes a graph schema reference.
+    """
+    if "Schema=" not in line:
+        return False
+    lowered = line.lower()
+    return "graphschema" in lowered or "edgraph" in lowered
 
 
 def collect_node_blocks(block: GraphBlock) -> list[NodeBlock]:

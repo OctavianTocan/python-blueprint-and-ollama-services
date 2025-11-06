@@ -1,0 +1,43 @@
+Begin Object Class=/Script/Engine.Blueprint Name="BP_GameSettings" ParentClass=/Script/Engine.DataAsset CppClassName="AGameSettings"
+   VariableData=(
+      (Name="MaxPlayers",Value=8,Category="Game",VarType=IntProperty),
+      (Name="GameTitle",Value="My Awesome Game",Category="Game",VarType=StrProperty),
+      (Name="EnableAI",Value=true,Category="Features",VarType=BoolProperty),
+      (Name="DifficultyLevel",Value=2,Category="Difficulty",VarType=EnumProperty,EnumValue="Hard")
+   )
+   
+   Begin Object Class=/Script/Engine.EdGraph Name="EventGraph"
+      Schema=Class"/Script/UnrealEd.EdGraphSchema_K2"
+      Nodes(0)=(Class=/Script/BlueprintGraph.K2Node_FunctionEntry,Name="K2Node_FunctionEntry_0",NodeGuid=E14I1D5E6F7G8H9I0J1K2L3M4N5O6P7Q)
+      Nodes(1)=(Class=/Script/BlueprintGraph.K2Node_CallFunction,Name="K2Node_CallFunction_2",NodeGuid=F25J2E6F7G8H9I0J1K2L3M4N5O6P7Q8R)
+      Nodes(2)=(Class=/Script/BlueprintGraph.K2Node_VariableGet,Name="K2Node_VariableGet_0",NodeGuid=G36K3F7G8H9I0J1K2L3M4N5O6P7Q8R9S)
+      Nodes(3)=(Class=/Script/BlueprintGraph.K2Node_FunctionResult,Name="K2Node_FunctionResult_0",NodeGuid=H47L4G8H9I0J1K2L3M4N5O6P7Q8R9S0T)
+      Nodes(4)=(Class=/Script/UnrealEd.EdGraphNode_Comment,Name="EdGraphNode_Comment_1",NodeGuid=I58M5H9I0J1K2L3M4N5O6P7Q8R9S0T1U)
+      Begin Object Class=/Script/BlueprintGraph.K2Node_FunctionEntry Name="K2Node_FunctionEntry_0"
+         NodeComment="Entry point"
+         NodePosX=0
+         NodePosY=0
+      End Object
+      Begin Object Class=/Script/BlueprintGraph.K2Node_CallFunction Name="K2Node_CallFunction_2"
+         FunctionReference=(MemberParent=Class"/Script/Engine.Object",MemberName="GetClass")
+         NodeComment="Get settings class"
+         NodePosX=200
+         NodePosY=0
+      End Object
+      Begin Object Class=/Script/BlueprintGraph.K2Node_VariableGet Name="K2Node_VariableGet_0"
+         VariableReference=(MemberParent=BP_GameSettings,MemberName="DifficultyLevel",MemberGuid=J69N6I0J1K2L3M4N5O6P7Q8R9S0T1U2V)
+         NodePosX=400
+         NodePosY=0
+      End Object
+      Begin Object Class=/Script/BlueprintGraph.K2Node_FunctionResult Name="K2Node_FunctionResult_0"
+         NodePosX=600
+         NodePosY=0
+      End Object
+      Begin Object Class=/Script/UnrealEd.EdGraphNode_Comment Name="EdGraphNode_Comment_1"
+         NodeComment="Load difficulty setting and return"
+         Size=(SizeX=300.0,SizeY=80.0)
+         NodePosX=150
+         NodePosY=-50
+      End Object
+   End Object
+End Object

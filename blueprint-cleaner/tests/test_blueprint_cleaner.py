@@ -7,7 +7,7 @@ artifacts, integrates Pieces-driven summarisation, and emits Unreal-ready C++.
 
 from __future__ import annotations
 
-import json
+import commentjson
 from dataclasses import is_dataclass
 
 import pytest
@@ -39,6 +39,23 @@ Begin Object Name="EventGraph"
    Begin Object Class=/Script/BlueprintGraph.EdGraphNode_Comment Name="EdGraphNode_Comment_0"
       NodeComment="Apply jump if healthy"
    End Object
+End Object
+""".strip()
+
+WIDGET_BLUEPRINT_SAMPLE = """
+Begin Object Class=/Script/UMG.WidgetBlueprintGeneratedClass Name="WBP_Test"
+End Object
+
+Bindings(0)=(ObjectName="TextBlock_1",PropertyName="Text",FunctionName="GetText_0")
+WidgetVariableNameToGuidMap=(("TextBlock_1", ABCDEF1234567890ABCDEF1234567890),("CanvasPanel_0", FEDCBA0987654321FEDCBA0987654321))
+Animations(0)="/Script/UMG.WidgetAnimation'WBP_Test:Fade'"
+
+Begin Object Class=/Script/Engine.EdGraph Name="EventGraph"
+    Schema="/Script/CoreUObject.Class'/Script/UMGEditor.WidgetGraphSchema'"
+    Nodes(0)="/Script/BlueprintGraph.K2Node_CustomEvent'K2Node_CustomEvent_0'"
+    Begin Object Class=/Script/BlueprintGraph.K2Node_CustomEvent Name="K2Node_CustomEvent_0"
+        CustomFunctionName="Event Test"
+    End Object
 End Object
 """.strip()
 
@@ -75,7 +92,7 @@ def test_generate_artifacts_exposes_all_required_outputs():
 
     # Markdown and JSON outputs must be populated and consistent.
     assert "# Blueprint: BP_Test" in artifacts.markdown
-    payload = json.loads(artifacts.json_text)
+    payload = commentjson.loads(artifacts.json_text)
     assert payload["name"] == "BP_Test"
     assert payload["cpp_class"] == "ABP_Test"
     assert payload["graphs"], "Expected serialized graphs in JSON output"
@@ -96,6 +113,36 @@ def test_generate_artifacts_exposes_all_required_outputs():
     assert artifacts.cpp_source_path == "Source/Game/BP_Test.cpp"
 
 
+def test_widget_blueprint_reports_umg_metadata():
+    """Widget blueprints should expose bindings, animations, and widget variables."""
+
+    from blueprint_cleaner.pipeline import generate_blueprint_artifacts
+
+    summariser, _ = make_stub_summariser()
+    artifacts = generate_blueprint_artifacts(
+        WIDGET_BLUEPRINT_SAMPLE,
+        summariser=summariser,
+        summary_chunk_size=120,
+    )
+
+    report = artifacts.report
+    assert report.widget_bindings, "Expected widget bindings to be parsed"
+    assert report.widget_bindings[0].widget_name == "TextBlock_1"
+    assert report.widget_animations == ["Fade"]
+    assert any(item.name == "CanvasPanel_0" for item in report.widget_variables)
+    assert report.graphs, "Widget graph schema should still be parsed"
+
+    markdown = artifacts.markdown
+    assert "## UMG Bindings" in markdown
+    assert "## UMG Animations" in markdown
+    assert "## Widget Variables" in markdown
+
+    payload = commentjson.loads(artifacts.json_text)
+    assert payload["widget_bindings"]
+    assert payload["widget_animations"]
+    assert payload["widget_variables"]
+
+
 def test_generate_bundled_output_returns_json_bundle(tmp_path):
     """Pipeline bundle output should serialise to JSON containing C++ artifacts."""
 
@@ -112,7 +159,7 @@ def test_generate_bundled_output_returns_json_bundle(tmp_path):
     )
 
     bundle_text = bundle_path.read_text(encoding="utf-8")
-    bundle = json.loads(bundle_text)
+    bundle = commentjson.loads(bundle_text)
 
     assert bundle["metadata"]["name"] == "BP_Test"
     assert "bundle" in bundle["metadata"]["formats"]
@@ -179,3 +226,46 @@ def test_rolling_summary_batches_respect_chunk_size(
 
     assert summary.startswith("<summary-")
     assert len(calls) == expected_calls
+
+
+def test_commentjson_loads_allows_comments():
+    """Test that commentjson.loads correctly parses JSON strings containing comments.
+
+    This test verifies that the commentjson library can handle various types of
+    comments within JSON strings, including:
+    - Single-line comments using //
+    - Inline comments using /* */
+    - Comments at the end of lines
+
+    The test creates a JSON string with multiple comment styles and ensures
+    that the underlying data is correctly parsed while comments are ignored.
+
+    Raises:
+        AssertionError: If the parsed JSON values don't match expected values.
+        ImportError: If the commentjson module is not installed.
+
+    Example:
+        >>> test_commentjson_loads_allows_comments()
+        # Test passes silently if successful
+
+    Note:
+        This test requires the 'commentjson' package to be installed.
+        Install with: pip install commentjson
+    """
+    import commentjson
+
+    # JSON string containing various comment styles that standard JSON parsers would reject
+    json_with_comments = """
+    {
+        // This is a single-line comment
+        "foo": 123, /* Inline comment */
+        "bar": "baz" // Another comment
+    }
+    """
+
+    # Parse the JSON string with comments
+    result = commentjson.loads(json_with_comments)
+
+    # Verify that the data was parsed correctly and comments were ignored
+    assert result["foo"] == 123
+    assert result["bar"] == "baz"

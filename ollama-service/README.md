@@ -24,11 +24,13 @@ uv sync
 
 ```bash
 # Development mode with auto-reload
-uv run uvicorn ollama_service.api:app --reload --port 4001
+uv run -m uvicorn ollama_service.api:app --reload --port 4001
 
 # Production mode
-uv run uvicorn ollama_service.api:app --host 0.0.0.0 --port 4001
+uv run -m uvicorn ollama_service.api:app --host 0.0.0.0 --port 4001
 ```
+
+**Note:** On Windows, use `uv run -m uvicorn` instead of `uv run uvicorn` to avoid "Failed to canonicalize script path" errors.
 
 The service will be available at `http://localhost:4001`.
 
@@ -176,7 +178,7 @@ uv run pytest tests/
 uv sync
 
 # Run with auto-reload
-uv run uvicorn ollama_service.api:app --reload --port 4001
+uv run -m uvicorn ollama_service.api:app --reload --port 4001
 
 # Check logs for request/response monitoring
 ```
