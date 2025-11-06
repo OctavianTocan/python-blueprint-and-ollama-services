@@ -5,6 +5,9 @@ Wraps toolkit file I/O functions with blueprint-specific operations.
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 from toolkit.console import print_metric_summary
 from toolkit.file_io import read_text_with_encoding_detection, write_text_utf8
 
@@ -43,3 +46,17 @@ def print_report_summary(report: BlueprintReport) -> None:
 
     total_calls = len({call for graph in report.graphs for call in graph.calls})
     print_metric_summary("unique function calls", total_calls)
+
+
+def find_copy_files(directory: str) -> list[str]:
+    """Recursively find all .COPY files in a directory.
+
+    @param directory: Root directory to search.
+    @return: Sorted list of absolute paths to .COPY files.
+    """
+    copy_files = []
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".COPY"):
+                copy_files.append(os.path.join(root, file))
+    return sorted(copy_files)

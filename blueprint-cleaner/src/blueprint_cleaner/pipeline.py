@@ -19,6 +19,14 @@ from .report import build_blueprint_report
 
 SummaryFn = Callable[[str], str]
 SUMMARY_REQUIRED_FORMATS = {"summary", "bundle"}
+FORMAT_EXTENSIONS = {
+    "markdown": ".md",
+    "json": ".json",
+    "bundle": ".bundle.json",
+    "summary": ".summary.txt",
+    "cpp-header": ".h",
+    "cpp-source": ".cpp",
+}
 
 
 def generate_blueprint_artifacts(
@@ -141,6 +149,80 @@ def clean_blueprint_file(
         print(f"Error processing file: {exc}")
         traceback.print_exc()
         return False
+
+
+def clean_blueprint_directory(
+    input_dir: str,
+    output_dir: str,
+    chunk_size: int = 4000,
+    format_type: str = "markdown",
+    debug: bool = False,
+    fail_fast: bool = False,
+    summariser: Optional[SummaryFn] = None,
+) -> tuple[int, int]:
+    """Process all .COPY files in a directory.
+
+    @param input_dir: Directory containing .COPY files.
+    @param output_dir: Directory for output files.
+    @param chunk_size: Token limit for AI summary chunks.
+    @param format_type: Output format (markdown, json, etc.).
+    @param debug: Enable debug logging.
+    @param fail_fast: Stop on first error if True.
+    @param summariser: Optional summariser function.
+    @return: Tuple of (successful_count, failed_count).
+    """
+    from .io_utils import find_copy_files
+
+    if not os.path.exists(input_dir):
+        print(f"Error: Input directory '{input_dir}' not found.")
+        return (0, 0)
+
+    copy_files = find_copy_files(input_dir)
+    if not copy_files:
+        print(f"No .COPY files found in '{input_dir}'")
+        return (0, 0)
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    total = len(copy_files)
+    successful = 0
+    failed = 0
+
+    print(f"\nFound {total} .COPY file{'s' if total != 1 else ''} to process\n")
+
+    for index, input_file in enumerate(copy_files, start=1):
+        base_name = os.path.splitext(os.path.basename(input_file))[0]
+        extension = FORMAT_EXTENSIONS.get(format_type, ".md")
+        output_file = os.path.join(output_dir, f"{base_name}{extension}")
+
+        print(f"[{index}/{total}] Processing {base_name}...")
+
+        success = clean_blueprint_file(
+            input_file,
+            output_file,
+            chunk_size,
+            format_type,
+            debug,
+            summariser,
+        )
+
+        if success:
+            successful += 1
+        else:
+            failed += 1
+            if fail_fast:
+                print("\n❌ Stopping due to error (--fail-fast enabled)")
+                break
+
+    summary_text = "Batch Processing Summary:"
+    separator = "=" * len(summary_text)
+    print(f"\n{separator}")
+    print(summary_text)
+    print(f"  ✓ Successful: {successful}/{total}")
+    print(f"  ✗ Failed: {failed}/{total}")
+    print(f"{separator}\n")
+
+    return (successful, failed)
 
 
 def _default_summariser() -> SummaryFn:
