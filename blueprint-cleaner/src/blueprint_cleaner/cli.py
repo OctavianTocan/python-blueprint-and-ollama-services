@@ -84,7 +84,7 @@ def main(argv: list[str] | None = None) -> None:
 
     output_path = args.output
     format_choice = "markdown" if args.format == "text" else args.format
-    
+
     if not output_path:
         base_name = os.path.splitext(args.input)[0]
         extension = get_extension_for_format(format_choice)
