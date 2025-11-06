@@ -17,6 +17,15 @@ SUPPORTED_FORMATS = [
     "cpp-source",
 ]
 
+FORMAT_EXTENSIONS = {
+    "markdown": ".md",
+    "json": ".json",
+    "bundle": ".bundle.json",
+    "summary": ".summary.txt",
+    "cpp-header": ".h",
+    "cpp-source": ".cpp",
+}
+
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the argument parser for the CLI."""
@@ -106,15 +115,7 @@ def main(argv: list[str] | None = None) -> None:
         output_path = args.output
         if not output_path:
             base_name = os.path.splitext(args.input)[0]
-            extension_map = {
-                "markdown": ".md",
-                "json": ".json",
-                "bundle": ".bundle.json",
-                "summary": ".summary.txt",
-                "cpp-header": ".h",
-                "cpp-source": ".cpp",
-            }
-            extension = extension_map.get(format_choice, ".md")
+            extension = FORMAT_EXTENSIONS.get(format_choice, ".md")
             output_path = f"{base_name}_cleaned{extension}"
 
         success = clean_blueprint_file(

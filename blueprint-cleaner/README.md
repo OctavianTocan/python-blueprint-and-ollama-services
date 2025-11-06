@@ -142,11 +142,11 @@ Found 3 .COPY files to process
 [3/3] Processing EXAMPLE_WBP_SimpleUI...
 ...
 
-============================================================
+=========================
 Batch Processing Summary:
   ✓ Successful: 3/3
   ✗ Failed: 0/3
-============================================================
+=========================
 
 ✓ All files processed successfully
 Output directory: data/output/

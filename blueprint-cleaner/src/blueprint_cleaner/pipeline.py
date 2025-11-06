@@ -19,6 +19,14 @@ from .report import build_blueprint_report
 
 SummaryFn = Callable[[str], str]
 SUMMARY_REQUIRED_FORMATS = {"summary", "bundle"}
+FORMAT_EXTENSIONS = {
+    "markdown": ".md",
+    "json": ".json",
+    "bundle": ".bundle.json",
+    "summary": ".summary.txt",
+    "cpp-header": ".h",
+    "cpp-source": ".cpp",
+}
 
 
 def generate_blueprint_artifacts(
@@ -184,16 +192,7 @@ def clean_blueprint_directory(
 
     for index, input_file in enumerate(copy_files, start=1):
         base_name = os.path.splitext(os.path.basename(input_file))[0]
-        
-        extension_map = {
-            "markdown": ".md",
-            "json": ".json",
-            "bundle": ".bundle.json",
-            "summary": ".summary.txt",
-            "cpp-header": ".h",
-            "cpp-source": ".cpp",
-        }
-        extension = extension_map.get(format_type, ".md")
+        extension = FORMAT_EXTENSIONS.get(format_type, ".md")
         output_file = os.path.join(output_dir, f"{base_name}{extension}")
 
         print(f"[{index}/{total}] Processing {base_name}...")
@@ -215,11 +214,13 @@ def clean_blueprint_directory(
                 print("\n❌ Stopping due to error (--fail-fast enabled)")
                 break
 
-    print(f"\n{'='*60}")
-    print(f"Batch Processing Summary:")
+    summary_text = "Batch Processing Summary:"
+    separator = "=" * len(summary_text)
+    print(f"\n{separator}")
+    print(summary_text)
     print(f"  ✓ Successful: {successful}/{total}")
     print(f"  ✗ Failed: {failed}/{total}")
-    print(f"{'='*60}\n")
+    print(f"{separator}\n")
 
     return (successful, failed)
 
