@@ -9,7 +9,6 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "ollama-service",
-    "pre-commit>=4.3.0",
 ]
 
 [build-system]
@@ -33,4 +32,5 @@ ollama-service = { workspace = true, editable = true }
 [dependency-groups]
 dev = [
     "pytest>=8.4.2",
+    "pre-commit>=4.3.0",
 ]

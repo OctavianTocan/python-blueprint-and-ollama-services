@@ -18,6 +18,7 @@ from .io_utils import print_report_summary, read_text_file, write_text_file
 from .report import build_blueprint_report
 
 SummaryFn = Callable[[str], str]
+SUMMARY_REQUIRED_FORMATS = {"summary", "bundle"}
 
 
 def generate_blueprint_artifacts(
@@ -37,7 +38,7 @@ def generate_blueprint_artifacts(
 
     # Only generate AI summary if the format requires it
     summary = ""
-    if format_type.lower() in ["summary", "bundle"]:
+    if format_type.lower() in SUMMARY_REQUIRED_FORMATS:
         summary = generate_rolling_summary(
             markdown,
             summariser or _default_summariser(),
@@ -120,7 +121,7 @@ def clean_blueprint_file(
 
         # Only provide summariser if the format requires AI summary
         summariser_to_use = summariser
-        if format_type.lower() in ["summary", "bundle"] and summariser is None:
+        if format_type.lower() in SUMMARY_REQUIRED_FORMATS and summariser is None:
             summariser_to_use = _default_summariser()
 
         artifacts = generate_blueprint_artifacts(

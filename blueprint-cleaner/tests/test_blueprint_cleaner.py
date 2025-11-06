@@ -226,3 +226,46 @@ def test_rolling_summary_batches_respect_chunk_size(
 
     assert summary.startswith("<summary-")
     assert len(calls) == expected_calls
+
+
+def test_commentjson_loads_allows_comments():
+    """Test that commentjson.loads correctly parses JSON strings containing comments.
+
+    This test verifies that the commentjson library can handle various types of
+    comments within JSON strings, including:
+    - Single-line comments using //
+    - Inline comments using /* */
+    - Comments at the end of lines
+
+    The test creates a JSON string with multiple comment styles and ensures
+    that the underlying data is correctly parsed while comments are ignored.
+
+    Raises:
+        AssertionError: If the parsed JSON values don't match expected values.
+        ImportError: If the commentjson module is not installed.
+
+    Example:
+        >>> test_commentjson_loads_allows_comments()
+        # Test passes silently if successful
+
+    Note:
+        This test requires the 'commentjson' package to be installed.
+        Install with: pip install commentjson
+    """
+    import commentjson
+
+    # JSON string containing various comment styles that standard JSON parsers would reject
+    json_with_comments = """
+    {
+        // This is a single-line comment
+        "foo": 123, /* Inline comment */
+        "bar": "baz" // Another comment
+    }
+    """
+
+    # Parse the JSON string with comments
+    result = commentjson.loads(json_with_comments)
+
+    # Verify that the data was parsed correctly and comments were ignored
+    assert result["foo"] == 123
+    assert result["bar"] == "baz"
