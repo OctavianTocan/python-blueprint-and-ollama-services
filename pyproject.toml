@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Shared utilities for Python projects"
 readme = "README.md"
 authors = [
-    { name = "Octavian Tocan", email = "tocanoctavian@gmail.com" }
+    { name = "Octavian Tocan", email = "contact@octaviantocan.com" }
 ]
 requires-python = ">=3.13"
 dependencies = [
