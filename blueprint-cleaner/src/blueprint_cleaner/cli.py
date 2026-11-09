@@ -6,7 +6,7 @@ import argparse
 import os
 import sys
 
-from .pipeline import clean_blueprint_file
+from .pipeline import clean_blueprint_directory, clean_blueprint_file
 
 SUPPORTED_FORMATS = [
     "markdown",
@@ -16,6 +16,15 @@ SUPPORTED_FORMATS = [
     "cpp-header",
     "cpp-source",
 ]
+
+FORMAT_EXTENSIONS = {
+    "markdown": ".md",
+    "json": ".json",
+    "bundle": ".bundle.json",
+    "summary": ".summary.txt",
+    "cpp-header": ".h",
+    "cpp-source": ".cpp",
+}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -29,14 +38,19 @@ def build_parser() -> argparse.ArgumentParser:
             "  %(prog)s input.copy\n"
             "  %(prog)s input.copy -o cleaned.md\n"
             "  %(prog)s input.copy --format json\n"
-            "  %(prog)s input.copy -d  # debug mode with detailed logs"
+            "  %(prog)s data/in/ -o data/out/ --format markdown\n"
+            "  %(prog)s input.copy -d  # debug mode with detailed logs\n"
+            "  %(prog)s data/in/ -o data/out/ --fail-fast  # stop on first error"
         ),
     )
-    parser.add_argument("input", help="Input .COPY file path")
+    parser.add_argument(
+        "input",
+        help="Input .COPY file path or directory containing .COPY files",
+    )
     parser.add_argument(
         "-o",
         "--output",
-        help="Output file path (default: input_cleaned.md/json)",
+        help="Output file path (for single file) or directory (for batch processing)",
     )
     parser.add_argument(
         "-f",
@@ -51,6 +65,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Enable debug mode with detailed logs",
     )
+    parser.add_argument(
+        "--fail-fast",
+        action="store_true",
+        help="Stop batch processing on first error",
+    )
     return parser
 
 
@@ -60,33 +79,56 @@ def main(argv: list[str] | None = None) -> None:
     parser = build_parser()
     args = parser.parse_args(argv)
 
-    output_path = args.output
-    if not output_path:
-        base_name = os.path.splitext(args.input)[0]
-        format_choice = args.format if args.format != "text" else "markdown"
-        extension_map = {
-            "markdown": ".md",
-            "json": ".json",
-            "bundle": ".bundle.json",
-            "summary": ".summary.txt",
-            "cpp-header": ".h",
-            "cpp-source": ".cpp",
-        }
-        extension = extension_map.get(format_choice, ".md")
-        output_path = f"{base_name}_cleaned{extension}"
-
+    # Determine if input is a directory or file
+    is_directory = os.path.isdir(args.input)
     format_choice = "markdown" if args.format == "text" else args.format
-    success = clean_blueprint_file(
-        args.input,
-        output_path,
-        8192,
-        format_choice,
-        args.debug,
-    )
-    if success:
-        print(f"\nOutput saved to: {output_path}")
-        sys.exit(0)
-    sys.exit(1)
+
+    if is_directory:
+        # Batch processing mode
+        output_dir = args.output
+        if not output_dir:
+            # Default output directory is input_cleaned/
+            output_dir = f"{args.input.rstrip('/')}_cleaned"
+
+        successful, failed = clean_blueprint_directory(
+            args.input,
+            output_dir,
+            8192,
+            format_choice,
+            args.debug,
+            args.fail_fast,
+        )
+
+        if failed == 0:
+            print(f"✓ All files processed successfully")
+            print(f"Output directory: {output_dir}")
+            sys.exit(0)
+        elif successful > 0:
+            print(f"⚠ Some files failed to process")
+            print(f"Output directory: {output_dir}")
+            sys.exit(1)
+        else:
+            print(f"✗ All files failed to process")
+            sys.exit(1)
+    else:
+        # Single file processing mode
+        output_path = args.output
+        if not output_path:
+            base_name = os.path.splitext(args.input)[0]
+            extension = FORMAT_EXTENSIONS.get(format_choice, ".md")
+            output_path = f"{base_name}_cleaned{extension}"
+
+        success = clean_blueprint_file(
+            args.input,
+            output_path,
+            8192,
+            format_choice,
+            args.debug,
+        )
+        if success:
+            print(f"\nOutput saved to: {output_path}")
+            sys.exit(0)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

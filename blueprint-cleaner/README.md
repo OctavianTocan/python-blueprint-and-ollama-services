@@ -6,6 +6,7 @@ Transform Unreal Engine 5 blueprint `.COPY` files into AI-friendly summaries for
 
 - **Clean extraction**: Parses variables, graphs, function calls, and metadata from blueprint exports
 - **Multiple formats**: Output as Markdown or JSONC (JSON with Comments)
+- **Batch processing**: Process multiple blueprint files at once with progress tracking
 - **Graph insights**: Entry points, function calls, variable reads/writes, and developer comments
 - **Modular architecture**: Small, focused modules following clean code principles
 
@@ -77,7 +78,7 @@ Final report → `pipeline.py`
 cd blueprint-cleaner
 uv sync
 
-# Process a blueprint file
+# Process a single blueprint file
 uv run blueprint-cleaner data/in/MyBlueprint.COPY
 
 # Custom output
@@ -88,6 +89,67 @@ uv run blueprint-cleaner data/in/MyBlueprint.COPY --format json
 
 # Debug mode
 uv run blueprint-cleaner data/in/MyBlueprint.COPY -d
+
+# Batch process all .COPY files in a directory
+uv run blueprint-cleaner data/in/ -o data/out/
+
+# Batch process with custom format
+uv run blueprint-cleaner data/in/ -o data/out/ --format json
+
+# Batch process with fail-fast mode (stop on first error)
+uv run blueprint-cleaner data/in/ -o data/out/ --fail-fast
+```
+
+## Batch Processing
+
+Process multiple blueprint files at once by passing a directory path instead of a single file.
+
+### Features
+
+- **Recursive scanning**: Automatically finds all `.COPY` files in subdirectories
+- **Progress tracking**: Shows "Processing 3/10 blueprints..." status
+- **Error handling**: Continue processing on errors, or use `--fail-fast` to stop immediately
+- **Summary report**: Displays success/failure counts after processing
+- **Smart naming**: Output files are named after the blueprint (e.g., `BP_Character.md`)
+
+### Usage
+
+```bash
+# Process all blueprints in a directory
+uv run blueprint-cleaner data/blueprints/ -o data/output/
+
+# The tool will:
+# 1. Find all .COPY files recursively
+# 2. Process each with the same format/options
+# 3. Save to output directory maintaining filename
+# 4. Show progress and summary
+```
+
+### Example Output
+
+```
+Found 3 .COPY files to process
+
+[1/3] Processing EXAMPLE_BP_GameSettings...
+✓ Extracted:
+  - variables: 5
+  - graphs: 2
+  ...
+
+[2/3] Processing EXAMPLE_BP_SimpleCharacter...
+...
+
+[3/3] Processing EXAMPLE_WBP_SimpleUI...
+...
+
+=========================
+Batch Processing Summary:
+  ✓ Successful: 3/3
+  ✗ Failed: 0/3
+=========================
+
+✓ All files processed successfully
+Output directory: data/output/
 ```
 
 ## Project Structure
@@ -171,16 +233,19 @@ The project follows strict clean code principles:
 ## CLI Options
 
 ```
-blueprint-cleaner [-h] [-o OUTPUT] [-f {markdown,text,json}] [-d] input
+blueprint-cleaner [-h] [-o OUTPUT] [-f {markdown,text,json,...}] [-d] [--fail-fast] input
 
 Positional arguments:
-  input                 Input .COPY file path
+  input                 Input .COPY file path or directory containing .COPY files
 
 Options:
   -h, --help            Show help message
-  -o, --output OUTPUT   Output file path (default: input_cleaned.md/json)
-  -f, --format FORMAT   Output format: markdown, text, json (default: markdown)
+  -o, --output OUTPUT   Output file path (for single file) or directory (for batch processing)
+                        Default: input_cleaned.md/json (single file) or input_cleaned/ (directory)
+  -f, --format FORMAT   Output format: markdown, text, json, bundle, summary, cpp-header, cpp-source
+                        Default: markdown
   -d, --debug           Enable debug mode with detailed logs
+  --fail-fast           Stop batch processing on first error (only applies to directory input)
 ```
 
 ## Example Output
